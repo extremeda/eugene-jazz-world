@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jazz Modes</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d0d0d;
+      color: #e8e0d0;
+      font-family: 'Georgia', serif;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 2rem 3rem 1rem;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: normal;
+      letter-spacing: 0.15em;
+      color: #c8a96e;
+    }
+
+    header p {
+      margin-top: 0.4rem;
+      font-size: 0.85rem;
+      color: #888;
+      letter-spacing: 0.05em;
+    }
+
+    .root-selector {
+      padding: 1.2rem 3rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      border-bottom: 1px solid #1e1e1e;
+    }
+
+    .root-selector label {
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      color: #aaa;
+      text-transform: uppercase;
+    }
+
+    .root-selector select {
+      background: #1a1a1a;
+      color: #e8e0d0;
+      border: 1px solid #333;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.95rem;
+      font-family: inherit;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+
+    .root-selector select:focus { outline: none; border-color: #c8a96e; }
+
+    .layout {
+      display: flex;
+      height: calc(100vh - 130px);
+    }
+
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      border-right: 1px solid #1e1e1e;
+      overflow-y: auto;
+      padding: 1rem 0;
+    }
+
+    .group-label {
+      padding: 0.5rem 1.2rem 0.3rem;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #777;
+    }
+
+    .mode-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 0.65rem 1.2rem;
+      background: none;
+      border: none;
+      color: #bbb;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-family: inherit;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .mode-btn:hover { color: #e8e0d0; background: #141414; }
+    .mode-btn.active {
+      color: #c8a96e;
+      border-left-color: #c8a96e;
+      background: #161410;
+    }
+
+    .mode-btn .degree {
+      font-size: 0.7rem;
+      color: #777;
+      float: right;
+      margin-top: 2px;
+    }
+
+    .mode-btn.active .degree { color: #8a6a3a; }
+
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2rem 3rem;
+    }
+
+    .mode-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .mode-header h2 {
+      font-size: 2rem;
+      font-weight: normal;
+      color: #c8a96e;
+      letter-spacing: 0.08em;
+    }
+
+    .mode-header .parent {
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 0.3rem;
+      letter-spacing: 0.06em;
+    }
+
+    .mode-header .sound-tag {
+      display: inline-block;
+      margin-top: 0.6rem;
+      padding: 0.2rem 0.7rem;
+      border: 1px solid #444;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: #aaa;
+      letter-spacing: 0.06em;
+    }
+
+    .section {
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #777;
+      margin-bottom: 0.8rem;
+    }
+
+    .notes-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .note-cell {
+      min-width: 48px;
+      padding: 0.6rem 0.4rem;
+      text-align: center;
+      background: #151515;
+      border: 1px solid #2a2a2a;
+      border-radius: 4px;
+    }
+
+    .note-cell .note-name {
+      font-size: 1.1rem;
+      color: #e8e0d0;
+    }
+
+    .note-cell.root .note-name { color: #c8a96e; font-weight: bold; }
+    .note-cell.characteristic .note-name { color: #7eb8c9; }
+
+    .note-cell .interval {
+      font-size: 0.65rem;
+      color: #888;
+      margin-top: 0.25rem;
+    }
+
+    .note-cell.characteristic .interval { color: #6a9aaa; }
+
+    .interval-legend {
+      margin-top: 0.7rem;
+      font-size: 0.75rem;
+      color: #888;
+    }
+
+    .interval-legend span { color: #7eb8c9; }
+
+    .piano {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      margin-top: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
+    .octave {
+      position: relative;
+      display: flex;
+      flex-shrink: 0;
+    }
+
+    .key {
+      position: relative;
+      border-radius: 0 0 4px 4px;
+      cursor: default;
+      flex-shrink: 0;
+    }
+
+    .key.white {
+      width: 28px;
+      height: 100px;
+      background: #1e1e1e;
+      border: 1px solid #333;
+      margin-right: -1px; /* overlap borders */
+      z-index: 0;
+    }
+
+    .key.black {
+      position: absolute;
+      top: 0;
+      width: 17px;
+      height: 62px;
+      background: #111;
+      border: 1px solid #444;
+      z-index: 1;
+    }
+
+    .key.in-scale.white { background: #2a251a; border-color: #5a4a28; }
+    .key.in-scale.black { background: #3a3020; border-color: #6a5a30; }
+    .key.root-key.white { background: #4a3a18; border-color: #c8a96e; }
+    .key.root-key.black { background: #5a4a20; border-color: #c8a96e; }
+    .key.char-key.white { background: #1a2a30; border-color: #7eb8c9; }
+    .key.char-key.black { background: #1a2530; border-color: #7eb8c9; }
+
+    .key-label {
+      position: absolute;
+      bottom: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.5rem;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .key.white .key-label { color: #888; }
+    .key.black .key-label { color: #888; }
+    .key.in-scale.white .key-label { color: #ccc; }
+    .key.root-key .key-label { color: #c8a96e !important; }
+    .key.char-key .key-label { color: #7eb8c9 !important; }
+
+    .chords-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.6rem;
+    }
+
+    .chord-card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 4px;
+      padding: 0.7rem 0.9rem;
+    }
+
+    .chord-card .chord-name { font-size: 1rem; color: #e8e0d0; }
+    .chord-card .chord-notes { font-size: 0.72rem; color: #888; margin-top: 0.2rem; }
+    .chord-card .chord-function { font-size: 0.7rem; color: #8ab87a; margin-top: 0.15rem; }
+
+    .description {
+      line-height: 1.7;
+      color: #aaa;
+      font-size: 0.9rem;
+      max-width: 640px;
+    }
+
+    .usage-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .usage-list li {
+      font-size: 0.85rem;
+      color: #aaa;
+      padding-left: 1rem;
+      position: relative;
+    }
+
+    .usage-list li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: #666;
+    }
+
+    .examples-row {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .example-tag {
+      padding: 0.3rem 0.8rem;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      color: #aaa;
+      font-style: italic;
+    }
+
+    .play-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.9rem;
+      padding: 0.4rem 1rem;
+      background: none;
+      border: 1px solid #3a3020;
+      border-radius: 20px;
+      color: #c8a96e;
+      font-size: 0.8rem;
+      font-family: inherit;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .play-btn:hover { background: #1a1508; border-color: #c8a96e; }
+    .play-btn.playing { border-color: #7eb8c9; color: #7eb8c9; }
+    .play-btn.playing:hover { background: #0a1518; }
+
+    .play-btn svg { flex-shrink: 0; }
+
+    .key.playing { background: #5a8a9a !important; border-color: #7eb8c9 !important; transition: background 0.05s; }
+
+    .chord-card {
+      position: relative;
+    }
+
+    .chord-play-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      background: none;
+      border: 1px solid #333;
+      border-radius: 50%;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .chord-play-btn:hover { color: #c8a96e; border-color: #c8a96e; background: #1a1508; }
+    .chord-play-btn.playing { color: #7eb8c9; border-color: #7eb8c9; }
+
+    /* ── Metronome ── */
+    .metro-wrap {
+      margin-left: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      user-select: none;
+    }
+
+    .metro-circle {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 35%, #252525, #111 70%);
+      border: 2px solid #333;
+      position: relative;
+      cursor: grab;
+      touch-action: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .metro-circle:active { cursor: grabbing; }
+    .metro-circle.running {
+      border-color: #c8a96e;
+      box-shadow: 0 0 10px rgba(200, 169, 110, 0.2);
+    }
+
+    /* bright dot at top edge �� rotates with the circle */
+    .metro-dot {
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      background: #c8a96e;
+      border-radius: 50%;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* thin line from center to dot */
+    .metro-line {
+      position: absolute;
+      width: 1px;
+      background: #5a4a28;
+      top: 13px;
+      bottom: 50%;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .metro-bpm-val {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      color: #e8e0d0;
+      pointer-events: none;
+      /* counter-rotate so BPM text stays upright */
+    }
+
+    .metro-info {
+      font-size: 0.62rem;
+      color: #777;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Jazz Modes</h1>
+  <p>Scales, intervals, characteristic tones, and harmonic context</p>
+</header>
+
+<div class="root-selector">
+  <label>Root</label>
+  <select id="rootSelect">
+    <option value="C">C</option>
+    <option value="C#">C# / Db</option>
+    <option value="D">D</option>
+    <option value="D#">D# / Eb</option>
+    <option value="E">E</option>
+    <option value="F">F</option>
+    <option value="F#">F# / Gb</option>
+    <option value="G">G</option>
+    <option value="G#">G# / Ab</option>
+    <option value="A">A</option>
+    <option value="A#">A# / Bb</option>
+    <option value="B">B</option>
+  </select>
+
+  <div class="metro-wrap">
+    <div class="metro-circle" id="metro-circle">
+      <div class="metro-dot"></div>
+      <div class="metro-line"></div>
+      <div class="metro-bpm-val" id="metro-bpm-val">80</div>
+    </div>
+    <div class="metro-info" id="metro-info">♩ = 80 · click to start</div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar" id="sidebar"></div>
+  <div class="main" id="main"></div>
+</div>
+
+<script>
+const CHROMATIC = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+
+// Proper enharmonic spelling based on scale degree
+const LETTERS = ['C','D','E','F','G','A','B'];
+const NAT = {C:0, D:2, E:4, F:5, G:7, A:9, B:11};
+// [letter, accidental semitone offset] for each chromatic root
+const ROOT_PREF = {
+  'C':['C',0],'C#':['C',1],'D':['D',0],'D#':['E',-1],
+  'E':['E',0],'F':['F',0],'F#':['F',1],'G':['G',0],
+  'G#':['A',-1],'A':['A',0],'A#':['B',-1],'B':['B',0]
+};
+
+function spelledNote(root, semitoneOffset, intervalName) {
+  const [rootLetter, rootAcc] = ROOT_PREF[root];
+  const degreeNum = parseInt(intervalName.replace(/[b#]/g, ''));
+  const letterIdx = (LETTERS.indexOf(rootLetter) + degreeNum - 1) % 7;
+  const targetLetter = LETTERS[letterIdx];
+  const rootSemitone = (NAT[rootLetter] + rootAcc + 12) % 12;
+  const noteSemitone = (rootSemitone + semitoneOffset) % 12;
+  let diff = (noteSemitone - NAT[targetLetter] + 12) % 12;
+  if (diff > 6) diff -= 12;
+  return targetLetter + ['bb','b','','#','##'][diff + 2];
+}
+
+function getScaleNotes(root, intervals) {
+  const ri = CHROMATIC.indexOf(root);
+  return intervals.map(i => CHROMATIC[(ri + i) % 12]);
+}
+
+function getSpelledScale(root, intervals, intervalNames) {
+  return intervals.map((s, i) => spelledNote(root, s, intervalNames[i]));
+}
+
+const MODES = [
+  {
+    group: 'Modes of the Major Scale',
+    modes: [
+      {
+        name: 'Ionian', degree: 'I', parent: 'Major Scale',
+        intervals: [0,2,4,5,7,9,11],
+        intervalNames: ['1','2','3','4','5','6','7'],
+        characteristic: [4], // major 3rd and major 7th
+        sound: 'Bright, stable, resolved',
+        chords: [
+          { name: 'Cmaj7', notes: 'C E G B', fn: 'Imaj7', semitones: [0,4,7,11] },
+          { name: 'Cmaj9', notes: 'C E G B D', fn: 'Imaj9', semitones: [0,4,7,11,14] },
+          { name: 'C6/9', notes: 'C E G A D', fn: 'I6/9', semitones: [0,4,7,9,14] },
+        ],
+        description: 'The foundation of Western harmony. Bright and resolved, it sits naturally on Imaj7 chords. Less common as a "color" in jazz — musicians often prefer Lydian for major tonics.',
+        usage: ['Imaj7 chords in major keys', 'Diatonic harmony', 'Ballad melodies over tonic'],
+        examples: ['Giant Steps (key centers)', 'Autumn Leaves (major sections)'],
+      },
+      {
+        name: 'Dorian', degree: 'ii', parent: 'Major Scale',
+        intervals: [0,2,3,5,7,9,10],
+        intervalNames: ['1','2','b3','4','5','6','b7'],
+        characteristic: [9], // natural 6 — the defining Dorian note
+        sound: 'Minor with natural 6 — cool, sophisticated',
+        chords: [
+          { name: 'Cm7', notes: 'C Eb G Bb', fn: 'IIm7', semitones: [0,3,7,10] },
+          { name: 'Cm9', notes: 'C Eb G Bb D', fn: 'IIm9', semitones: [0,3,7,10,14] },
+          { name: 'Cm11', notes: 'C Eb G Bb D F', fn: 'IIm11', semitones: [0,3,7,10,14,17] },
+        ],
+        description: 'The most important minor mode in jazz. Its natural 6th (A in C Dorian) gives it a sophisticated, "cool" quality absent from pure Aeolian. The go-to choice for IIm7 chords in a II–V–I.',
+        usage: ['IIm7 in II–V–I progressions', 'Minor key tonic (modal jazz)', 'ii chord in major key'],
+        examples: ['So What — Miles Davis', 'Impressions — Coltrane', 'Maiden Voyage'],
+      },
+      {
+        name: 'Phrygian', degree: 'iii', parent: 'Major Scale',
+        intervals: [0,1,3,5,7,8,10],
+        intervalNames: ['1','b2','b3','4','5','b6','b7'],
+        characteristic: [1], // b2 — the Spanish/flamenco sound
+        sound: 'Dark, Spanish, tense',
+        chords: [
+          { name: 'Cm7', notes: 'C Eb G Bb', fn: 'IIIm7', semitones: [0,3,7,10] },
+          { name: 'Db/C', notes: 'Db F Ab / C', fn: 'bIImaj/I', semitones: [0,1,5,8] },
+        ],
+        description: 'Rarely used in mainstream jazz but essential in flamenco and modern fusion. The flat-2 creates a very dark, tense color. Sometimes used for bIIIm7 chords or over pedal points.',
+        usage: ['IIIm7 chords (rare)', 'Flamenco-influenced jazz', 'Tense pedal sections'],
+        examples: ['Flamenco Sketches — Miles Davis', 'Phrygian-inflected bebop lines'],
+      },
+      {
+        name: 'Lydian', degree: 'IV', parent: 'Major Scale',
+        intervals: [0,2,4,6,7,9,11],
+        intervalNames: ['1','2','3','#4','5','6','7'],
+        characteristic: [6], // #4 / #11 — the dreamy tritone
+        sound: 'Dreamy, floating, ethereal',
+        chords: [
+          { name: 'Cmaj7#11', notes: 'C E G B F#', fn: 'IVmaj7#11', semitones: [0,4,7,11,18] },
+          { name: 'Cmaj9#11', notes: 'C E G B D F#', fn: 'IVmaj9#11', semitones: [0,4,7,11,14,18] },
+        ],
+        description: 'The "floating" major mode. The #4 (or #11) adds a dreamy, unresolved quality to major chords. Jazz musicians often prefer Lydian over Ionian for Imaj7 chords because the #4 avoids clashing with the 5th in the bass.',
+        usage: ['Imaj7 chords (preferred over Ionian by many)', 'IVmaj7 chords', 'Film music, floating textures'],
+        examples: ['Flying — John Lennon/McCartney', 'Joe Satriani\'s Flying in a Blue Dream', 'Many Bill Evans voicings'],
+      },
+      {
+        name: 'Mixolydian', degree: 'V', parent: 'Major Scale',
+        intervals: [0,2,4,5,7,9,10],
+        intervalNames: ['1','2','3','4','5','6','b7'],
+        characteristic: [10], // b7 — the blues/dominant sound
+        sound: 'Dominant, bluesy, driving',
+        chords: [
+          { name: 'C7', notes: 'C E G Bb', fn: 'V7', semitones: [0,4,7,10] },
+          { name: 'C9', notes: 'C E G Bb D', fn: 'V9', semitones: [0,4,7,10,14] },
+          { name: 'C13', notes: 'C E G Bb D A', fn: 'V13', semitones: [0,4,7,10,14,21] },
+        ],
+        description: 'The essential dominant mode. Its b7 creates the tension that wants to resolve. Used over unaltered dominant 7th chords — when you want drive without the "alt" or chromatic tension.',
+        usage: ['Dominant 7th (V7) chords', 'Blues progressions', 'Unaltered dominant in II–V–I'],
+        examples: ['Blues in F', 'Rhythm changes (turnarounds)', 'Funk grooves'],
+      },
+      {
+        name: 'Aeolian', degree: 'vi', parent: 'Major Scale',
+        intervals: [0,2,3,5,7,8,10],
+        intervalNames: ['1','2','b3','4','5','b6','b7'],
+        characteristic: [8], // b6 — what distinguishes it from Dorian
+        sound: 'Sad, natural minor',
+        chords: [
+          { name: 'Cm7', notes: 'C Eb G Bb', fn: 'VIm7', semitones: [0,3,7,10] },
+          { name: 'Cm9', notes: 'C Eb G Bb D', fn: 'VIm9', semitones: [0,3,7,10,14] },
+        ],
+        description: 'Natural minor — familiar but less sophisticated than Dorian in jazz context. The b6 gives a darker, sadder sound compared to Dorian\'s natural 6. Used over VIm7 chords or when a "sadder" minor quality is wanted.',
+        usage: ['VIm7 in major keys', 'Minor key background harmony', 'Darker minor passages'],
+        examples: ['Minor key standards (background)', 'Summertime (minor sections)'],
+      },
+      {
+        name: 'Locrian', degree: 'vii°', parent: 'Major Scale',
+        intervals: [0,1,3,5,6,8,10],
+        intervalNames: ['1','b2','b3','4','b5','b6','b7'],
+        characteristic: [6], // b5 — the diminished quality
+        sound: 'Unstable, diminished, tense',
+        chords: [
+          { name: 'Cø7', notes: 'C Eb Gb Bb', fn: 'VIIø7', semitones: [0,3,6,10] },
+          { name: 'Cm7b5', notes: 'C Eb Gb Bb', fn: 'VIIm7b5', semitones: [0,3,6,10] },
+        ],
+        description: 'The most dissonant mode — rarely used melodically due to the unstable b5. Primarily associated with the half-diminished (ø7) chord which appears as the II chord in minor II–V–I progressions.',
+        usage: ['IIø7 (half-diminished) in minor II–V–I', 'Passing diminished chords', 'Tense pedal points'],
+        examples: ['Minor II–V–I (Dm7b5–G7alt–Cm)', 'Autumn Leaves (minor sections)'],
+      },
+    ]
+  },
+  {
+    group: 'Melodic Minor Modes',
+    modes: [
+      {
+        name: 'Melodic Minor', degree: 'i', parent: 'Melodic Minor Scale',
+        intervals: [0,2,3,5,7,9,11],
+        intervalNames: ['1','2','b3','4','5','6','7'],
+        characteristic: [11], // major 7 over minor chord
+        sound: 'Bittersweet — minor chord with major 7',
+        chords: [
+          { name: 'CmM7', notes: 'C Eb G B', fn: 'ImM7', semitones: [0,3,7,11] },
+          { name: 'CmM9', notes: 'C Eb G B D', fn: 'ImM9', semitones: [0,3,7,11,14] },
+        ],
+        description: 'Minor with a major 7th — the "James Bond" chord sound. Creates a bittersweet, sophisticated color. Used over minMaj7 chords and as a tonic minor sound in more adventurous playing.',
+        usage: ['ImMaj7 chords', 'Tonic minor in modern jazz', 'James Bond-style tension'],
+        examples: ['James Bond Theme', 'Minor ii-V-i resolutions with minMaj7'],
+      },
+      {
+        name: 'Dorian b2', degree: 'ii', parent: 'Melodic Minor Scale',
+        intervals: [0,1,3,5,7,9,10],
+        intervalNames: ['1','b2','b3','4','5','6','b7'],
+        characteristic: [1], // b2 over Dorian framework
+        sound: 'Dark Dorian, exotic',
+        chords: [
+          { name: 'Cm7', notes: 'C Eb G Bb', fn: 'IIm7', semitones: [0,3,7,10] },
+          { name: 'Cm11b9', notes: 'C Eb G Bb Db F', fn: 'IIm11b9', semitones: [0,3,7,10,13,17] },
+        ],
+        description: 'Dorian with a flat 2 — also called Phrygian #6. Darker and more exotic than standard Dorian. Used over IIm7 chords when a more tense or Spanish color is desired.',
+        usage: ['IIm7 with b9 tension', 'Exotic/Middle-Eastern color', 'Sus chords with b9'],
+        examples: ['McCoy Tyner-style modal playing', 'Exotic minor II chords'],
+      },
+      {
+        name: 'Lydian Augmented', degree: 'bIII+', parent: 'Melodic Minor Scale',
+        intervals: [0,2,4,6,8,9,11],
+        intervalNames: ['1','2','3','#4','#5','6','7'],
+        characteristic: [8], // #5 augmented note
+        sound: 'Dreamy, augmented, surreal',
+        chords: [
+          { name: 'Cmaj7#5', notes: 'C E G# B', fn: 'IIImaj7#5', semitones: [0,4,8,11] },
+          { name: 'Caug', notes: 'C E G#', fn: 'III+', semitones: [0,4,8] },
+        ],
+        description: 'Lydian with a raised 5th. Very floating and surreal — both the #4 and #5 create maximum "ungrounded" tension. Used over augmented major 7 chords.',
+        usage: ['maj7#5 chords', 'Augmented passages', 'Dreamy transitions'],
+        examples: ['Herbie Hancock harmonic explorations', 'Modern jazz reharmonization'],
+      },
+      {
+        name: 'Lydian Dominant', degree: 'IV', parent: 'Melodic Minor Scale',
+        intervals: [0,2,4,6,7,9,10],
+        intervalNames: ['1','2','3','#4','5','6','b7'],
+        characteristic: [6], // #4 over dominant chord
+        sound: 'Bright dominant, tritone sub flavor',
+        chords: [
+          { name: 'C7#11', notes: 'C E G Bb F#', fn: 'IV7#11', semitones: [0,4,7,10,18] },
+          { name: 'C9#11', notes: 'C E G Bb D F#', fn: 'IV9#11', semitones: [0,4,7,10,14,18] },
+          { name: 'C13#11', notes: 'C E G Bb D F# A', fn: 'IV13#11', semitones: [0,4,7,10,14,18,21] },
+        ],
+        description: 'The tritone substitution sound. Lydian Dominant = Mixolydian + #4/#11. One of the most used scales in modern jazz over dominant 7th chords — the #11 creates that Herbie Hancock/Chick Corea brightness.',
+        usage: ['Dominant 7th chords (especially #11)', 'Tritone substitution targets', 'SubV7 chords'],
+        examples: ['Herbie Hancock\'s voicings', 'Chick Corea harmonics', 'Bill Evans tritone subs'],
+      },
+      {
+        name: 'Mixolydian b6', degree: 'V', parent: 'Melodic Minor Scale',
+        intervals: [0,2,4,5,7,8,10],
+        intervalNames: ['1','2','3','4','5','b6','b7'],
+        characteristic: [8], // b6 over dominant
+        sound: 'Mysterious dominant, Hindu scale',
+        chords: [
+          { name: 'C7b13', notes: 'C E G Bb Ab', fn: 'V7b13', semitones: [0,4,7,10,20] },
+          { name: 'C7sus', notes: 'C F G Bb', fn: 'Vsus', semitones: [0,5,7,10] },
+        ],
+        description: 'Mixolydian with a flat 6 (b13). Also known as the Hindu scale. Used over dominant chords when a b13 color is wanted without the full altered sound. Creates a unique "suspended" dominant feel.',
+        usage: ['V7b13 chords', 'Dominant with b13 color', 'Hindu/exotic dominant sound'],
+        examples: ['McCoy Tyner quartal harmony', 'Modal dominant vamps'],
+      },
+      {
+        name: 'Locrian #2', degree: 'viø', parent: 'Melodic Minor Scale',
+        intervals: [0,2,3,5,6,8,10],
+        intervalNames: ['1','2','b3','4','b5','b6','b7'],
+        characteristic: [2], // natural 2 (vs b2 in Locrian)
+        sound: 'Half-diminished, less tense than Locrian',
+        chords: [
+          { name: 'Cø7', notes: 'C Eb Gb Bb', fn: 'VIø7', semitones: [0,3,6,10] },
+          { name: 'Cm7b5', notes: 'C Eb Gb Bb', fn: 'VIm7b5', semitones: [0,3,6,10] },
+        ],
+        description: 'Locrian with a natural 2 — far more usable than standard Locrian. The preferred scale for half-diminished (ø7) chords in minor II–V–I progressions. The natural 9 (D in C Locrian #2) gives the ø chord a more open, less tense sound.',
+        usage: ['IIø7 in minor II–V–I (preferred over Locrian)', 'Half-diminished chord solos', 'Minor ii chord'],
+        examples: ['Minor II–V–I standard progressions', 'Autumn Leaves (Dm7b5)', 'What Is This Thing Called Love'],
+      },
+      {
+        name: 'Altered Scale', degree: 'vii', parent: 'Melodic Minor Scale',
+        intervals: [0,1,3,4,6,8,10],
+        intervalNames: ['1','b2','#2','3','b5','b6','b7'],
+        characteristic: [1], // all altered tensions
+        sound: 'Maximum tension — all altered notes',
+        chords: [
+          { name: 'C7alt', notes: 'C E Bb + b9 #9 b13', fn: 'V7alt', semitones: [0,4,10,13,15,20] },
+          { name: 'C7b9#9', notes: 'C E G Bb Db D#', fn: 'V7b9#9', semitones: [0,4,7,10,13,15] },
+          { name: 'C7#9b13', notes: 'C E G Bb D# Ab', fn: 'V7#9b13', semitones: [0,4,7,10,15,20] },
+        ],
+        description: 'The ultimate dominant tension scale — contains b9, #9, b5/#11, AND b13 simultaneously. Used over altered dominant chords (V7alt) to create maximum tension before resolving. The "super-Locrian" mode.',
+        usage: ['V7alt — altered dominant before resolution', 'Bebop and post-bop dominant lines', 'Maximum tension in II–V–I'],
+        examples: ['Countdown — Coltrane', 'Giant Steps substitutions', 'Any bebop V7alt chord'],
+      },
+    ]
+  },
+  {
+    group: 'Symmetric Scales',
+    modes: [
+      {
+        name: 'Whole Tone', degree: '—', parent: 'Whole Tone Scale',
+        intervals: [0,2,4,6,8,10],
+        intervalNames: ['1','2','3','#4','#5','b7'],
+        characteristic: [6],
+        sound: 'Floating, ambiguous, Debussy',
+        chords: [
+          { name: 'C7#5', notes: 'C E G# Bb', fn: 'V7aug', semitones: [0,4,8,10] },
+          { name: 'C7#5#11', notes: 'C E G# Bb F#', fn: 'V7#5#11', semitones: [0,4,8,10,18] },
+        ],
+        description: 'Six equal whole steps — completely symmetrical. Has no half steps, so it feels directionless and floating. Used over augmented dominant 7th chords (7#5). Only 2 transpositions exist.',
+        usage: ['Dominant 7th#5 chords', 'Impressionistic floating passages', 'Dominant without resolution pull'],
+        examples: ['Debussy (classical origin)', 'Wayne Shorter\'s augmented chords', 'Bill Evans impressionistic passages'],
+      },
+      {
+        name: 'Diminished (H-W)', degree: '—', parent: 'Octatonic Scale',
+        intervals: [0,1,3,4,6,7,9,10],
+        intervalNames: ['1','b2','b3','3','b5','5','6','b7'],
+        characteristic: [1],
+        sound: 'Tense, symmetrical tension',
+        chords: [
+          { name: 'C7b9', notes: 'C E G Bb Db', fn: 'V7b9', semitones: [0,4,7,10,13] },
+          { name: 'C7b9#11', notes: 'C E G Bb Db F#', fn: 'V7b9#11', semitones: [0,4,7,10,13,18] },
+          { name: 'C13b9', notes: 'C E G Bb Db A', fn: 'V13b9', semitones: [0,4,7,10,13,21] },
+        ],
+        description: 'The half-whole diminished — starts with a half step. Used over dominant 7th chords with b9. Contains both the chord tones AND all the altered tensions in an 8-note pattern. 3 transpositions exist.',
+        usage: ['V7b9 dominant chords', 'Bebop dominant lines', 'Symmetric tension over dominants'],
+        examples: ['Bebop lines on V7', 'Coltrane\'s "inside-outside" playing', 'Joe Pass dominant lines'],
+      },
+      {
+        name: 'Diminished (W-H)', degree: '—', parent: 'Octatonic Scale',
+        intervals: [0,2,3,5,6,8,9,11],
+        intervalNames: ['1','2','b3','4','b5','#5','6','7'],
+        characteristic: [6],
+        sound: 'Diminished chord extensions',
+        chords: [
+          { name: 'Cdim7', notes: 'C Eb Gb A', fn: 'dim7', semitones: [0,3,6,9] },
+          { name: 'Cdim7add9', notes: 'C Eb Gb A D', fn: 'dim7add9', semitones: [0,3,6,9,14] },
+        ],
+        description: 'The whole-half diminished — starts with a whole step. Used over diminished 7th chords. Its symmetry means a Cdim7 scale works equally over Ebdim7, Gbdim7, and Adim7.',
+        usage: ['Diminished 7th chords', 'Passing diminished chords', 'Connecting diatonic chords'],
+        examples: ['Rhythm changes bridge', 'Passing dim chords in standards', 'Bebop passing tones'],
+      },
+    ]
+  },
+  {
+    group: 'Blues & Pentatonic',
+    modes: [
+      {
+        name: 'Minor Pentatonic', degree: '—', parent: 'Pentatonic Scale',
+        intervals: [0,3,5,7,10],
+        intervalNames: ['1','b3','4','5','b7'],
+        characteristic: [3],
+        sound: 'Soulful, universal, bluesy',
+        chords: [
+          { name: 'C7', notes: 'C E G Bb', fn: 'I7', semitones: [0,4,7,10] },
+          { name: 'Cm7', notes: 'C Eb G Bb', fn: 'Im7', semitones: [0,3,7,10] },
+        ],
+        description: 'Five notes — the backbone of blues, jazz, and rock. Works over both minor and dominant 7th chords. Every jazz musician knows this scale. Simple but powerful.',
+        usage: ['Blues in any key', 'Over dominant 7th chords', 'Minor chord vamps'],
+        examples: ['Blues solos universally', 'Miles Davis Kind of Blue licks', 'Wes Montgomery lines'],
+      },
+      {
+        name: 'Major Pentatonic', degree: '—', parent: 'Pentatonic Scale',
+        intervals: [0,2,4,7,9],
+        intervalNames: ['1','2','3','5','6'],
+        characteristic: [9],
+        sound: 'Open, country, joyful',
+        chords: [
+          { name: 'Cmaj7', notes: 'C E G B', fn: 'Imaj7', semitones: [0,4,7,11] },
+          { name: 'C6', notes: 'C E G A', fn: 'I6', semitones: [0,4,7,9] },
+        ],
+        description: 'Bright and open — no half steps, no dissonance. The "country" sound but also used in jazz over major and dominant chords. Pentatonic superimposition (playing one root\'s pentatonic over another chord) is a hallmark of modern jazz.',
+        usage: ['Major and dominant chords', 'Pentatonic superimposition', 'Open, bright major passages'],
+        examples: ['McCoy Tyner pentatonic stacking', 'Woody Shaw trumpet lines', 'Contemporary jazz superimposition'],
+      },
+      {
+        name: 'Blues Scale', degree: '—', parent: 'Blues Scale',
+        intervals: [0,3,5,6,7,10],
+        intervalNames: ['1','b3','4','b5','5','b7'],
+        characteristic: [6], // blue note b5
+        sound: 'Blues, gritty, expressive',
+        chords: [
+          { name: 'C7', notes: 'C E G Bb', fn: 'I7', semitones: [0,4,7,10] },
+          { name: 'C9', notes: 'C E G Bb D', fn: 'I9', semitones: [0,4,7,10,14] },
+        ],
+        description: 'Minor pentatonic + the "blue note" (b5). That b5 is the essential blues sound — used as a passing tone or bent note. Works over all chords in a blues and is the source of the "blues feeling" in jazz.',
+        usage: ['All chords in a 12-bar blues', 'Expressive passing tones', 'Blues-influenced jazz phrasing'],
+        examples: ['12-bar blues universally', 'Charlie Parker blues heads', 'Bebop blues phrases'],
+      },
+    ]
+  }
+];
+
+let currentMode = MODES[0].modes[1]; // default: Dorian
+let currentRoot = 'C';
+
+function getScaleNotes(root, intervals) {
+  const ri = CHROMATIC.indexOf(root);
+  return intervals.map(i => CHROMATIC[(ri + i) % 12]);
+}
+
+function renderSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.innerHTML = '';
+  MODES.forEach(group => {
+    const label = document.createElement('div');
+    label.className = 'group-label';
+    label.textContent = group.group;
+    sidebar.appendChild(label);
+
+    group.modes.forEach(mode => {
+      const btn = document.createElement('button');
+      btn.className = 'mode-btn' + (mode === currentMode ? ' active' : '');
+      btn.innerHTML = `${mode.name}<span class="degree">${mode.degree}</span>`;
+      btn.onclick = () => { if (playbackStop) playbackStop(); currentMode = mode; renderMain(); renderSidebar(); };
+      sidebar.appendChild(btn);
+    });
+  });
+}
+
+function renderPiano(scaleNotes, root, charIndices) {
+  // W=28px white key width; black key positions (left edge) within a 196px octave
+  const WHITE_NOTES = ['C','D','E','F','G','A','B'];
+  const BLACK_KEYS  = [
+    { note: 'C#', left: 19 }, { note: 'D#', left: 47 },
+    { note: 'F#', left: 103 }, { note: 'G#', left: 131 }, { note: 'A#', left: 159 },
+  ];
+
+  const charNotes = charIndices.map(ci => scaleNotes[ci]);
+
+  function makeKey(n, type, oct) {
+    const key = document.createElement('div');
+    key.className = `key ${type}`;
+    key.dataset.note = n;
+    key.dataset.octave = String(oct);
+    const inScale = scaleNotes.includes(n);
+    const isRoot  = n === root;
+    const isChar  = charNotes.includes(n) && !isRoot;
+    if      (isRoot)   key.classList.add('root-key');
+    else if (isChar)   key.classList.add('char-key');
+    else if (inScale)  key.classList.add('in-scale');
+    if (inScale || isRoot) {
+      const label = document.createElement('div');
+      label.className = 'key-label';
+      label.textContent = n;
+      key.appendChild(label);
+    }
+    return key;
+  }
+
+  const piano = document.createElement('div');
+  piano.className = 'piano';
+
+  [4, 5].forEach(oct => {
+    const octEl = document.createElement('div');
+    octEl.className = 'octave';
+    WHITE_NOTES.forEach(n => octEl.appendChild(makeKey(n, 'white', oct)));
+    BLACK_KEYS.forEach(({ note: n, left }) => {
+      const key = makeKey(n, 'black', oct);
+      key.style.left = `${left}px`;
+      octEl.appendChild(key);
+    });
+    piano.appendChild(octEl);
+  });
+
+  return piano;
+}
+
+function renderMain() {
+  const m = currentMode;
+  const root = currentRoot;
+  const scaleNotes = getScaleNotes(root, m.intervals);
+  const charNotes = m.characteristic.map(i => scaleNotes[i]);
+
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+
+  // Header
+  const spelledScale = getSpelledScale(root, m.intervals, m.intervalNames);
+
+  const header = document.createElement('div');
+  header.className = 'mode-header';
+  header.innerHTML = `
+    <h2>${spelledScale[0]} ${m.name}</h2>
+    <div class="parent">${m.parent} — Mode ${m.degree}</div>
+    <div class="sound-tag">${m.sound}</div>
+  `;
+
+  const playBtn = document.createElement('button');
+  playBtn.className = 'play-btn';
+  playBtn.innerHTML = playIcon() + 'Play scale';
+  header.appendChild(playBtn);
+  main.appendChild(header);
+
+  // Notes
+  const notesSection = document.createElement('div');
+  notesSection.className = 'section';
+  notesSection.innerHTML = '<div class="section-title">Scale Degrees</div>';
+  const notesRow = document.createElement('div');
+  notesRow.className = 'notes-row';
+  scaleNotes.forEach((note, idx) => {
+    const cell = document.createElement('div');
+    cell.className = 'note-cell';
+    if (note === root) cell.classList.add('root');
+    if (charNotes.includes(note) && note !== root) cell.classList.add('characteristic');
+    cell.innerHTML = `<div class="note-name">${spelledScale[idx]}</div><div class="interval">${m.intervalNames[idx]}</div>`;
+    notesRow.appendChild(cell);
+  });
+  notesSection.appendChild(notesRow);
+  const legend = document.createElement('div');
+  legend.className = 'interval-legend';
+  const charSpelled = m.characteristic.map(i => spelledScale[i]);
+  legend.innerHTML = `Root: <b style="color:#c8a96e">${spelledScale[0]}</b> &nbsp;·&nbsp; Characteristic tone: <span>${charSpelled.join(', ')}</span>`;
+  notesSection.appendChild(legend);
+  main.appendChild(notesSection);
+
+  // Piano
+  const pianoSection = document.createElement('div');
+  pianoSection.className = 'section';
+  pianoSection.innerHTML = '<div class="section-title">Keyboard</div>';
+  const pianoEl = renderPiano(scaleNotes, root, m.characteristic);
+  pianoSection.appendChild(pianoEl);
+  main.appendChild(pianoSection);
+
+  // Wire play button now that pianoEl exists
+  playBtn.onclick = () => playScale(scaleNotes, playBtn, pianoEl);
+
+  // Chords
+  const rootSemitone = CHROMATIC.indexOf(root);
+  const chordSection = document.createElement('div');
+  chordSection.className = 'section';
+  chordSection.innerHTML = '<div class="section-title">Common Chords</div>';
+  const chordsGrid = document.createElement('div');
+  chordsGrid.className = 'chords-grid';
+
+  m.chords.forEach(ch => {
+    const card = document.createElement('div');
+    card.className = 'chord-card';
+    // Transpose chord name root
+    const chordRoot = ch.name.match(/^[A-G]#?/)[0];
+    const diff = (rootSemitone - CHROMATIC.indexOf('C') + 12) % 12;
+    const newChordRoot = CHROMATIC[(CHROMATIC.indexOf(chordRoot) + diff) % 12];
+    const newChordName = ch.name.replace(/^[A-G]#?/, newChordRoot);
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'chord-name';
+    nameEl.textContent = newChordName;
+
+    const notesEl = document.createElement('div');
+    notesEl.className = 'chord-notes';
+    notesEl.textContent = ch.notes;
+
+    const fnEl = document.createElement('div');
+    fnEl.className = 'chord-function';
+    fnEl.textContent = ch.fn;
+
+    const cPlayBtn = document.createElement('button');
+    cPlayBtn.className = 'chord-play-btn';
+    cPlayBtn.innerHTML = playIcon();
+    cPlayBtn.title = 'Play chord';
+    cPlayBtn.onclick = (e) => { e.stopPropagation(); playChord(rootSemitone, ch.semitones, cPlayBtn); };
+
+    card.appendChild(nameEl);
+    card.appendChild(notesEl);
+    card.appendChild(fnEl);
+    card.appendChild(cPlayBtn);
+    chordsGrid.appendChild(card);
+  });
+  chordSection.appendChild(chordsGrid);
+  main.appendChild(chordSection);
+
+  // Description
+  const descSection = document.createElement('div');
+  descSection.className = 'section';
+  descSection.innerHTML = `<div class="section-title">Character</div><p class="description">${m.description}</p>`;
+  main.appendChild(descSection);
+
+  // Usage
+  const usageSection = document.createElement('div');
+  usageSection.className = 'section';
+  usageSection.innerHTML = '<div class="section-title">Use Over</div>';
+  const ul = document.createElement('ul');
+  ul.className = 'usage-list';
+  m.usage.forEach(u => { const li = document.createElement('li'); li.textContent = u; ul.appendChild(li); });
+  usageSection.appendChild(ul);
+  main.appendChild(usageSection);
+
+  // Examples
+  const exSection = document.createElement('div');
+  exSection.className = 'section';
+  exSection.innerHTML = '<div class="section-title">Heard In</div>';
+  const exRow = document.createElement('div');
+  exRow.className = 'examples-row';
+  m.examples.forEach(e => {
+    const tag = document.createElement('div');
+    tag.className = 'example-tag';
+    tag.textContent = e;
+    exRow.appendChild(tag);
+  });
+  exSection.appendChild(exRow);
+  main.appendChild(exSection);
+}
+
+document.getElementById('rootSelect').addEventListener('change', e => {
+  currentRoot = e.target.value.split(' ')[0]; // handle "C# / Db"
+  // Find the actual chromatic note
+  const val = e.target.value;
+  if (val.includes('/')) {
+    currentRoot = val.split('/')[0].trim().replace(' ', '');
+  } else {
+    currentRoot = val.trim();
+  }
+  renderMain();
+});
+
+// ── Audio engine ────────────────────────────────────────────────────────────
+// Note frequencies (octave 4, semitone offset from C4 = 261.63 Hz)
+const NOTE_FREQ = {};
+CHROMATIC.forEach((n, i) => { NOTE_FREQ[n] = 261.63 * Math.pow(2, i / 12); });
+
+let audioCtx = null;
+let playbackStop   = null; // function to cancel in-progress scale playback
+let chordStop      = null; // function to cancel in-progress chord playback
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playNote(ctx, freq, startTime, duration) {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(freq, startTime);
+
+  // Piano-like envelope: fast attack, short decay, low sustain, release
+  gain.gain.setValueAtTime(0, startTime);
+  gain.gain.linearRampToValueAtTime(0.35, startTime + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.12, startTime + 0.08);
+  gain.gain.setValueAtTime(0.12, startTime + duration - 0.05);
+  gain.gain.linearRampToValueAtTime(0.0001, startTime + duration + 0.1);
+
+  osc.start(startTime);
+  osc.stop(startTime + duration + 0.15);
+}
+
+
+function playScale(scaleNotes, btn, pianoEl) {
+  if (playbackStop) { playbackStop(); return; }
+
+  const ctx = getAudioCtx();
+  // Each scale note = one quarter note at the current BPM
+  const gap          = 60 / metroBpm;
+  const noteDuration = gap * 0.82;
+  const allNotes = [...scaleNotes, scaleNotes[0]]; // ascend + return to root one octave up
+  const now = ctx.currentTime + 0.05;
+
+  // Pause standalone metronome while scale plays; restart after
+  const wasRunning = metroRunning;
+  if (wasRunning) {
+    clearTimeout(metroTimeout);
+    metroRunning = false;
+  }
+
+  // Highlight piano keys in sync — keyed by "NOTE-octave"
+  const keyEls = pianoEl ? pianoEl.querySelectorAll('.key') : [];
+  const keyMap = {};
+  keyEls.forEach(el => {
+    const n = el.dataset.note, o = el.dataset.octave;
+    if (n && o) keyMap[`${n}-${o}`] = el;
+  });
+
+  // Master gain for all scale notes — set to 0 on stop for instant silence
+  const scaleGain = ctx.createGain();
+  scaleGain.gain.setValueAtTime(1, now);
+  scaleGain.connect(ctx.destination);
+
+  function scheduleNote(freq, startTime, duration) {
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(scaleGain);          // through master, not directly to destination
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, startTime);
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(0.35, startTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.12, startTime + 0.08);
+    gain.gain.setValueAtTime(0.12, startTime + duration - 0.05);
+    gain.gain.linearRampToValueAtTime(0.0001, startTime + duration + 0.1);
+    osc.start(startTime);
+    osc.stop(startTime + duration + 0.15);
+  }
+
+  const rootIdx = CHROMATIC.indexOf(scaleNotes[0]);
+  const timeouts = [];
+  allNotes.forEach((note, i) => {
+    const noteIdx = CHROMATIC.indexOf(note);
+    const isLast  = i === allNotes.length - 1;
+    const isHigh  = isLast || noteIdx < rootIdx;
+    let freq = NOTE_FREQ[note];
+    if (isHigh) freq *= 2;
+    scheduleNote(freq, now + i * gap, noteDuration);
+
+    const mapKey = `${note}-${isHigh ? '5' : '4'}`;
+
+    const t1 = setTimeout(() => {
+      Object.values(keyMap).forEach(k => k.classList.remove('playing'));
+      const k = keyMap[mapKey];
+      if (k) k.classList.add('playing');
+      btn.classList.add('playing');
+      btn.innerHTML = stopIcon() + 'Stop';
+    }, (now + i * gap - ctx.currentTime) * 1000);
+
+    const t2 = setTimeout(() => {
+      const k = keyMap[mapKey];
+      if (k) k.classList.remove('playing');
+    }, (now + i * gap + noteDuration - ctx.currentTime) * 1000);
+
+    timeouts.push(t1, t2);
+  });
+
+  const cleanup = (resume) => {
+    keyEls.forEach(k => k.classList.remove('playing'));
+    btn.classList.remove('playing');
+    btn.innerHTML = playIcon() + 'Play scale';
+    playbackStop = null;
+    if (resume && wasRunning) {
+      metroRunning = true;
+      metroTick();
+    }
+  };
+
+  // Done
+  const totalMs = (now + allNotes.length * gap - ctx.currentTime) * 1000;
+  const tDone = setTimeout(() => cleanup(true), totalMs);
+  timeouts.push(tDone);
+
+  playbackStop = () => {
+    timeouts.forEach(clearTimeout);
+    scaleGain.gain.setValueAtTime(0, ctx.currentTime); // silence immediately
+    cleanup(false);
+  };
+}
+
+function playChord(rootSemitone, semitones, btn) {
+  // Stop whatever chord is currently playing (same or different)
+  if (chordStop) {
+    const wasSameBtn = chordStop.btn === btn;
+    chordStop();
+    if (wasSameBtn) return; // toggle off
+  }
+
+  const ctx = getAudioCtx();
+  const baseFreq = 261.63 * Math.pow(2, rootSemitone / 12);
+  const now      = ctx.currentTime + 0.05;
+  const strum    = 0.04;
+  const duration = 1.6;
+
+  const chordGain = ctx.createGain();
+  chordGain.gain.setValueAtTime(1, now);
+  chordGain.connect(ctx.destination);
+
+  semitones.forEach((s, i) => {
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(chordGain);
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(baseFreq * Math.pow(2, s / 12), now + i * strum);
+    gain.gain.setValueAtTime(0, now + i * strum);
+    gain.gain.linearRampToValueAtTime(0.35, now + i * strum + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.12, now + i * strum + 0.08);
+    gain.gain.setValueAtTime(0.12, now + i * strum + duration - 0.05);
+    gain.gain.linearRampToValueAtTime(0.0001, now + i * strum + duration + 0.1);
+    osc.start(now + i * strum);
+    osc.stop(now + i * strum + duration + 0.15);
+  });
+
+  btn.classList.add('playing');
+
+  const stopTimer = setTimeout(() => {
+    btn.classList.remove('playing');
+    chordStop = null;
+  }, (duration + semitones.length * strum + 0.2) * 1000);
+
+  chordStop = () => {
+    clearTimeout(stopTimer);
+    chordGain.gain.setValueAtTime(0, ctx.currentTime);
+    btn.classList.remove('playing');
+    chordStop = null;
+  };
+  chordStop.btn = btn;
+}
+
+function playIcon() {
+  return `<svg width="9" height="11" viewBox="0 0 10 12" fill="currentColor"><polygon points="0,0 10,6 0,12"/></svg>`;
+}
+function stopIcon() {
+  return `<svg width="9" height="11" viewBox="0 0 10 12" fill="currentColor"><rect x="0" y="0" width="4" height="12"/><rect x="6" y="0" width="4" height="12"/></svg>`;
+}
+// ────────────────────────────────────────────────────────────────────────────
+
+// ── Metronome ────────────────────────────────────────────────────────────────
+let metroBpm       = 80;
+let metroRunning   = false;
+let metroTimeout   = null;
+let metroAnimFrame = null;
+let metroRotation  = 0;
+let metroLastTs    = null;
+
+// Drag state
+let metroDragActive     = false;
+let metroDragLastAngle  = null;
+let metroDragAccum      = 0;
+let metroDragStartBpm   = 80;
+
+const metroCircleEl = document.getElementById('metro-circle');
+const metroBpmValEl = document.getElementById('metro-bpm-val');
+const metroInfoEl   = document.getElementById('metro-info');
+
+function metroGetAngle(x, y) {
+  const r = metroCircleEl.getBoundingClientRect();
+  return Math.atan2(y - (r.top + r.height / 2), x - (r.left + r.width / 2)) * 180 / Math.PI;
+}
+
+function metroSetBpm(bpm) {
+  metroBpm = Math.max(30, Math.min(200, Math.round(bpm)));
+  metroBpmValEl.textContent = metroBpm;
+  metroInfoEl.textContent = `♩ = ${metroBpm} · ${metroRunning ? 'click to stop' : 'click to start'}`;
+}
+
+function metroTick() {
+  if (!metroRunning) return;
+  metroTimeout = setTimeout(metroTick, 60000 / metroBpm);
+}
+
+function metroAnimate(ts) {
+  if (metroLastTs !== null) {
+    const dt = ts - metroLastTs;
+    metroRotation += dt * (360 * metroBpm / 60000);
+    // rotate the whole circle; counter-rotate the BPM label so it stays readable
+    metroCircleEl.style.transform = `rotate(${metroRotation}deg)`;
+    metroBpmValEl.style.transform  = `rotate(${-metroRotation}deg)`;
+  }
+  metroLastTs = ts;
+  metroAnimFrame = requestAnimationFrame(metroAnimate);
+}
+
+function metroStart() {
+  metroRunning = true;
+  metroLastTs  = null;
+  metroTick();
+  metroAnimFrame = requestAnimationFrame(metroAnimate);
+  metroCircleEl.classList.add('running');
+  metroInfoEl.textContent = `♩ = ${metroBpm} · click to stop`;
+}
+
+function metroStop() {
+  metroRunning = false;
+  clearTimeout(metroTimeout);
+  cancelAnimationFrame(metroAnimFrame);
+  metroCircleEl.classList.remove('running');
+  metroInfoEl.textContent = `♩ = ${metroBpm} · click to start`;
+}
+
+// Pointer drag — spin to change BPM
+metroCircleEl.addEventListener('pointerdown', e => {
+  metroDragActive    = true;
+  metroDragLastAngle = metroGetAngle(e.clientX, e.clientY);
+  metroDragAccum     = 0;
+  metroDragStartBpm  = metroBpm;
+  metroCircleEl.setPointerCapture(e.pointerId);
+  e.preventDefault();
+});
+
+metroCircleEl.addEventListener('pointermove', e => {
+  if (!metroDragActive) return;
+  const angle = metroGetAngle(e.clientX, e.clientY);
+  let delta = angle - metroDragLastAngle;
+  if (delta >  180) delta -= 360;
+  if (delta < -180) delta += 360;
+  metroDragAccum    += delta;
+  metroDragLastAngle = angle;
+  // 2 degrees per BPM — full circle ≈ 180 BPM range
+  metroSetBpm(metroDragStartBpm + metroDragAccum / 2);
+  // Also visually spin the circle with the drag when stopped
+  if (!metroRunning) {
+    metroRotation += delta;
+    metroCircleEl.style.transform = `rotate(${metroRotation}deg)`;
+    metroBpmValEl.style.transform  = `rotate(${-metroRotation}deg)`;
+  }
+});
+
+metroCircleEl.addEventListener('pointerup', () => {
+  const wasDrag = Math.abs(metroDragAccum) > 4;
+  metroDragActive = false;
+  if (!wasDrag) {
+    // treat as click — toggle start/stop
+    metroRunning ? metroStop() : metroStart();
+  }
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
+renderSidebar();
+renderMain();
+</script>
+</body>
+</html>
