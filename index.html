@@ -374,6 +374,69 @@
     .chord-play-btn:hover { color: #c8a96e; border-color: #c8a96e; background: #1a1508; }
     .chord-play-btn.playing { color: #7eb8c9; border-color: #7eb8c9; }
 
+    /* ── Mobile-only mode row (hidden on desktop) ── */
+    .mobile-mode-row { display: none; align-items: center; gap: 0.5rem; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      header { padding: 0.9rem 1.1rem 0.7rem; }
+      header h1 { font-size: 1.3rem; }
+      header p { font-size: 0.75rem; }
+
+      .root-selector {
+        padding: 0.7rem 1rem;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+      }
+
+      .root-selector label { font-size: 0.7rem; }
+      .root-selector select { font-size: 0.85rem; padding: 0.35rem 0.6rem; }
+
+      /* Show mobile mode picker, hide desktop sidebar */
+      .mobile-mode-row { display: flex; }
+      .sidebar { display: none; }
+
+      .layout {
+        height: auto;
+        min-height: calc(100vh - 140px);
+        flex-direction: column;
+      }
+
+      .main { padding: 1rem 1rem 2rem; }
+
+      .mode-header h2 { font-size: 1.4rem; }
+      .mode-header .parent { font-size: 0.75rem; }
+
+      .section { margin-bottom: 1.4rem; }
+      .section-title { font-size: 0.65rem; }
+
+      .notes-row { gap: 0.35rem; }
+      .note-cell { min-width: 38px; padding: 0.45rem 0.3rem; }
+      .note-cell .note-name { font-size: 0.9rem; }
+
+      .chords-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.5rem; }
+      .chord-card { padding: 0.6rem 0.75rem; }
+      .chord-card .chord-name { font-size: 0.9rem; }
+
+      .description { font-size: 0.82rem; }
+      .usage-list li { font-size: 0.8rem; }
+      .example-tag { font-size: 0.75rem; }
+
+      .play-btn { font-size: 0.75rem; padding: 0.35rem 0.85rem; }
+
+      /* Metronome: smaller on mobile */
+      .metro-circle { width: 54px; height: 54px; }
+      .metro-dot { width: 5px; height: 5px; top: 4px; }
+      .metro-line { top: 9px; }
+      .metro-bpm-val { font-size: 0.8rem; }
+      .metro-info { font-size: 0.55rem; }
+    }
+
+    @media (max-width: 400px) {
+      .root-selector { gap: 0.4rem; }
+      header h1 { font-size: 1.1rem; }
+    }
+
     /* ── Metronome ── */
     .metro-wrap {
       margin-left: auto;
@@ -470,13 +533,19 @@
     <option value="B">B</option>
   </select>
 
+  <!-- Mobile-only mode picker -->
+  <div class="mobile-mode-row">
+    <label>Mode</label>
+    <select id="mobileModePick"></select>
+  </div>
+
   <div class="metro-wrap">
     <div class="metro-circle" id="metro-circle">
       <div class="metro-dot"></div>
       <div class="metro-line"></div>
       <div class="metro-bpm-val" id="metro-bpm-val">80</div>
     </div>
-    <div class="metro-info" id="metro-info">♩ = 80 · click to start</div>
+    <div class="metro-info" id="metro-info">♩ = 80 · tap to start</div>
   </div>
 </div>
 
@@ -837,6 +906,7 @@ function getScaleNotes(root, intervals) {
 }
 
 function renderSidebar() {
+  // Desktop sidebar
   const sidebar = document.getElementById('sidebar');
   sidebar.innerHTML = '';
   MODES.forEach(group => {
@@ -853,14 +923,44 @@ function renderSidebar() {
       sidebar.appendChild(btn);
     });
   });
+
+  // Mobile dropdown — rebuild options, keep selected in sync
+  const mSel = document.getElementById('mobileModePick');
+  mSel.innerHTML = '';
+  MODES.forEach(group => {
+    const og = document.createElement('optgroup');
+    og.label = group.group;
+    group.modes.forEach(mode => {
+      const opt = document.createElement('option');
+      opt.textContent = `${mode.name}  ${mode.degree}`;
+      opt.selected = mode === currentMode;
+      opt.dataset.groupIdx = MODES.indexOf(group);
+      opt.dataset.modeIdx  = group.modes.indexOf(mode);
+      og.appendChild(opt);
+    });
+    mSel.appendChild(og);
+  });
 }
 
+document.getElementById('mobileModePick').addEventListener('change', e => {
+  const opt = e.target.selectedOptions[0];
+  const mode = MODES[opt.dataset.groupIdx].modes[opt.dataset.modeIdx];
+  if (playbackStop) playbackStop();
+  currentMode = mode;
+  renderMain();
+  renderSidebar();
+});
+
 function renderPiano(scaleNotes, root, charIndices) {
-  // W=28px white key width; black key positions (left edge) within a 196px octave
+  const mobile = window.innerWidth <= 768;
+  // Scale key dimensions for mobile
+  const W      = mobile ? 21 : 28;
+  const sc     = W / 28; // scale factor for black key positions
   const WHITE_NOTES = ['C','D','E','F','G','A','B'];
   const BLACK_KEYS  = [
-    { note: 'C#', left: 19 }, { note: 'D#', left: 47 },
-    { note: 'F#', left: 103 }, { note: 'G#', left: 131 }, { note: 'A#', left: 159 },
+    { note: 'C#', left: Math.round(19 * sc) }, { note: 'D#', left: Math.round(47 * sc) },
+    { note: 'F#', left: Math.round(103 * sc) }, { note: 'G#', left: Math.round(131 * sc) },
+    { note: 'A#', left: Math.round(159 * sc) },
   ];
 
   const charNotes = charIndices.map(ci => scaleNotes[ci]);
@@ -870,6 +970,10 @@ function renderPiano(scaleNotes, root, charIndices) {
     key.className = `key ${type}`;
     key.dataset.note = n;
     key.dataset.octave = String(oct);
+    if (mobile) {
+      if (type === 'white') { key.style.width = `${W}px`; key.style.height = `${Math.round(100 * sc)}px`; }
+      else                  { key.style.width = `${Math.round(17 * sc)}px`; key.style.height = `${Math.round(62 * sc)}px`; }
+    }
     const inScale = scaleNotes.includes(n);
     const isRoot  = n === root;
     const isChar  = charNotes.includes(n) && !isRoot;
