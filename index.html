@@ -2334,14 +2334,14 @@ function renderScalesView() {
       card.appendChild(soundEl);
 
       const notesEl = document.createElement('div');
-      notesEl.style.cssText = 'font-size:0.7rem;color:#c8a96e;margin-bottom:0.1rem;letter-spacing:0.04em;';
-      notesEl.textContent = spelledNotes.join(' · ');
+      notesEl.style.cssText = 'display:flex;flex-wrap:wrap;gap:0.25rem;margin-bottom:0.4rem;';
+      spelledNotes.forEach((n, i) => {
+        const pill = document.createElement('span');
+        pill.style.cssText = `font-size:0.7rem;color:#c8a96e;background:#1a1508;border:1px solid #3a3020;border-radius:4px;padding:0.1rem 0.4rem;white-space:nowrap;`;
+        pill.textContent = `${n} (${scale.intervalNames[i]})`;
+        notesEl.appendChild(pill);
+      });
       card.appendChild(notesEl);
-
-      const formulaEl = document.createElement('div');
-      formulaEl.style.cssText = 'font-size:0.62rem;color:#555;margin-bottom:0.5rem;font-style:italic;';
-      formulaEl.textContent = scale.intervalNames.join(' – ');
-      card.appendChild(formulaEl);
 
       const descEl = document.createElement('div');
       descEl.style.cssText = 'font-size:0.72rem;color:#999;line-height:1.6;margin-bottom:0.4rem;';
