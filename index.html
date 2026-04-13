@@ -482,26 +482,6 @@
     .sidebar-nav-btn svg { flex-shrink: 0; opacity: 0.75; }
     .sidebar-nav-btn.active svg { opacity: 1; }
 
-    /* ── Quick-jump pills ── */
-    .quick-jump {
-      display: flex;
-      gap: 0.4rem;
-      padding: 0.5rem 1.2rem 0.6rem;
-      flex-wrap: wrap;
-    }
-    .quick-jump-btn {
-      padding: 0.18rem 0.6rem;
-      background: #1a1508;
-      border: 1px solid #3a3020;
-      border-radius: 12px;
-      color: #c8a96e;
-      font-size: 0.68rem;
-      font-family: inherit;
-      letter-spacing: 0.06em;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .quick-jump-btn:hover { background: #252010; border-color: #c8a96e; }
 
     /* ── Active chord pill during progression playback ── */
     .prog-pill-active {
@@ -1509,29 +1489,6 @@ function renderSidebar() {
     renderSidebar();
   };
   sidebar.appendChild(modesHeader);
-
-  // Quick-jump to Ionian and Dorian
-  const quickJump = document.createElement('div');
-  quickJump.className = 'quick-jump';
-  [
-    { label: 'Ionian',  group: 0, idx: 0 },
-    { label: 'Dorian',  group: 0, idx: 1 },
-    { label: 'Mixolyd', group: 0, idx: 4 },
-    { label: 'Alt',     group: 1, idx: 6 },
-  ].forEach(({ label, group, idx }) => {
-    const btn = document.createElement('button');
-    btn.className = 'quick-jump-btn';
-    btn.textContent = label;
-    btn.onclick = () => {
-      if (playbackStop) playbackStop();
-      currentView = 'modes';
-      currentMode = MODES[group].modes[idx];
-      renderMain();
-      renderSidebar();
-    };
-    quickJump.appendChild(btn);
-  });
-  sidebar.appendChild(quickJump);
 
   MODES.forEach(group => {
     const label = document.createElement('div');
