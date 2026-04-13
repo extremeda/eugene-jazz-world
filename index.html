@@ -1791,8 +1791,6 @@ function buildChordPiano(noteNames) {
       const ctx = getAudioCtx();
       const freq = NOTE_FREQ[key.dataset.note];
       if (freq) playNote(ctx, freq, ctx.currentTime, 0.8);
-      key.classList.add('lit');
-      setTimeout(() => key.classList.remove('lit'), 300);
     });
   });
 
