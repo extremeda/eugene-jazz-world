@@ -2321,7 +2321,13 @@ function renderScalesView() {
       playBtn.onclick = () => {
         const ctx = getAudioCtx();
         const now = ctx.currentTime;
-        notes.forEach((n, i) => playNote(ctx, NOTE_FREQ[n], now + i * 0.22, 0.5));
+        const step = 0.22;
+        // ascending + octave root + descending
+        const ascDesc = [...notes, notes[0], ...[...notes].reverse()];
+        ascDesc.forEach((n, i) => {
+          const freq = NOTE_FREQ[n] * (i >= notes.length ? 2 : 1);
+          playNote(ctx, freq, now + i * step, 0.45);
+        });
       };
 
       topRow.appendChild(nameEl);
@@ -2333,14 +2339,15 @@ function renderScalesView() {
       soundEl.textContent = scale.sound;
       card.appendChild(soundEl);
 
-      // Note cells
+      // Note cells — include octave root at end
+      const notesWithOctave = [...spelledNotes, spelledNotes[0]];
+      const intervalsWithOctave = [...scale.intervalNames, '8'];
       const notesRow = document.createElement('div');
-      notesRow.className = 'notes-row';
-      notesRow.style.cssText = 'margin-bottom:0.75rem;';
-      spelledNotes.forEach((n, i) => {
+      notesRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.75rem;align-items:flex-start;';
+      notesWithOctave.forEach((n, i) => {
         const cell = document.createElement('div');
-        cell.className = 'note-cell' + (i === 0 ? ' root' : '');
-        cell.innerHTML = `<div class="note-name">${n}</div><div class="interval">${scale.intervalNames[i]}</div>`;
+        cell.style.cssText = 'min-width:44px;padding:0.5rem 0.3rem;text-align:center;background:#151515;border:1px solid #2a2a2a;border-radius:4px;flex-shrink:0;' + (i === 0 || i === notesWithOctave.length - 1 ? 'border-color:#5a4a28;' : '');
+        cell.innerHTML = `<div style="font-size:1rem;color:${i === 0 || i === notesWithOctave.length - 1 ? '#c8a96e' : '#e8e0d0'};">${n}</div><div style="font-size:0.62rem;color:#666;margin-top:0.2rem;">${intervalsWithOctave[i]}</div>`;
         notesRow.appendChild(cell);
       });
       card.appendChild(notesRow);
@@ -2350,7 +2357,6 @@ function renderScalesView() {
       pianoWrap.style.cssText = 'margin-bottom:0.75rem;overflow-x:auto;';
       const pianoEl = buildChordPiano(notes);
       pianoWrap.appendChild(pianoEl);
-      // Make keys clickable
       pianoEl._pianoContainer && pianoEl._pianoContainer.querySelectorAll('[data-note]').forEach(key => {
         key.style.cursor = 'pointer';
         key.addEventListener('mousedown', e => {
