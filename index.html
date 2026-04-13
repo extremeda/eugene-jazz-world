@@ -608,7 +608,7 @@
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: #555;
-      margin-bottom: 0;
+      margin-bottom: 0.5rem;
     }
 
     /* Piano key press animation */
@@ -1744,17 +1744,17 @@ function renderChordProgressionView() {
       // ── Piano detail (shows notes of active card) ──
       const pianoWrap = document.createElement('div');
       pianoWrap.className = 'prog-detail-piano';
-      const pianoTopRow = document.createElement('div');
-      pianoTopRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:0.3rem;';
       const pianoLabel = document.createElement('div');
       pianoLabel.className = 'prog-detail-piano-label';
       pianoLabel.textContent = 'Keyboard';
-      pianoTopRow.appendChild(pianoLabel);
-      pianoTopRow.appendChild(pBtn);
-      pianoWrap.appendChild(pianoTopRow);
-      // Start with a blank piano (no lit keys until something plays or is clicked)
+      pianoWrap.appendChild(pianoLabel);
+      // Piano + play button side by side
+      const pianoRow = document.createElement('div');
+      pianoRow.style.cssText = 'display:flex;align-items:center;gap:50px;';
       const pianoEl = buildChordPiano([]);
-      pianoWrap.appendChild(pianoEl);
+      pianoRow.appendChild(pianoEl);
+      pianoRow.appendChild(pBtn);
+      pianoWrap.appendChild(pianoRow);
       block.appendChild(pianoWrap);
 
       // Wire card clicks: activate card, update piano with strum animation, play chord
