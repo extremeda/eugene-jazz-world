@@ -622,10 +622,12 @@
       12%  { background: #c09030; box-shadow: 0 0 6px #c8a96e88; }
       100% { background: #b08820; box-shadow: 0 0 3px #c8a96e44; }
     }
-    .cp-piano-white     { position:absolute; border-radius:0 0 3px 3px; border:1px solid #aaa; background:#f0f0f0; }
-    .cp-piano-white.lit { animation: white-press 0.22s ease-out forwards; }
-    .cp-piano-black     { position:absolute; border-radius:0 0 2px 2px; border:1px solid #000; background:#222; z-index:1; }
-    .cp-piano-black.lit { animation: black-press 0.22s ease-out forwards; }
+    .cp-piano-white          { position:absolute; border-radius:0 0 3px 3px; border:1px solid #aaa; background:#f0f0f0; }
+    .cp-piano-white.lit      { animation: white-press 0.22s ease-out forwards; }
+    .cp-piano-white.playing  { background:#c8a96e !important; box-shadow:0 0 6px #c8a96e88; }
+    .cp-piano-black          { position:absolute; border-radius:0 0 2px 2px; border:1px solid #000; background:#222; z-index:1; }
+    .cp-piano-black.lit      { animation: black-press 0.22s ease-out forwards; }
+    .cp-piano-black.playing  { background:#b08820 !important; box-shadow:0 0 4px #c8a96e88; }
 
     /* ── Chord progression view ── */
     .cp-section { margin-bottom: 2.2rem; }
@@ -1753,44 +1755,51 @@ function buildChordPiano(noteNames) {
     const key = document.createElement('div');
     key.className = 'cp-piano-white';
     key.dataset.note = n;
+    key.dataset.octave = '4';
     key.style.cssText = `left:${wi * CP_KW}px;top:0;width:${CP_KW - 1}px;height:${CP_KH}px;`;
     container.appendChild(key);
   });
-  // Main octave black keys
   CP_PIANO_BLACK.forEach(({note, left}) => {
     const key = document.createElement('div');
     key.className = 'cp-piano-black';
     key.dataset.note = note;
+    key.dataset.octave = '4';
     key.style.cssText = `left:${left}px;top:0;width:14px;height:48px;`;
     container.appendChild(key);
   });
 
-  // Extra 3 white keys (C D E of next octave)
   const extraOff = CP_PIANO_WHITE.length * CP_KW;
   CP_EXTRA_WHITE.forEach((n, wi) => {
     const key = document.createElement('div');
     key.className = 'cp-piano-white cp-piano-extra';
     key.dataset.note = n;
+    key.dataset.octave = '5';
     key.style.cssText = `left:${extraOff + wi * CP_KW}px;top:0;width:${CP_KW - 1}px;height:${CP_KH}px;`;
     container.appendChild(key);
   });
-  // Extra black keys (C# D# of next octave)
   CP_EXTRA_BLACK.forEach(({note, left}) => {
     const key = document.createElement('div');
     key.className = 'cp-piano-black cp-piano-extra';
     key.dataset.note = note;
+    key.dataset.octave = '5';
     key.style.cssText = `left:${extraOff + left}px;top:0;width:14px;height:48px;`;
     container.appendChild(key);
   });
 
-  // Click to play note
+  // Click to play: light up while note plays, restore original state after
   container.querySelectorAll('[data-note]').forEach(key => {
     key.style.cursor = 'pointer';
     key.addEventListener('mousedown', e => {
       e.stopPropagation();
       const ctx = getAudioCtx();
       const freq = NOTE_FREQ[key.dataset.note];
-      if (freq) playNote(ctx, freq, ctx.currentTime, 0.8);
+      if (!freq) return;
+      playNote(ctx, freq, ctx.currentTime, 0.8);
+      const wasLit = key.classList.contains('lit');
+      key.classList.remove('lit');
+      void key.offsetWidth;
+      key.classList.add('lit');
+      if (!wasLit) setTimeout(() => key.classList.remove('lit'), 880);
     });
   });
 
@@ -2364,7 +2373,7 @@ function renderScalesView() {
       playBtn.className = 'play-btn';
       playBtn.style.cssText = 'margin-top:0;flex-shrink:0;';
       playBtn.innerHTML = playIcon() + 'Play scale';
-      playBtn.onclick = () => playScale(notes, playBtn, null);
+      playBtn.onclick = () => playScale(notes, playBtn, pianoEl);
       pianoTopRow.appendChild(pianoEl);
       pianoTopRow.appendChild(playBtn);
       pianoWrap.appendChild(pianoTopRow);
@@ -2488,12 +2497,17 @@ function playScale(scaleNotes, btn, pianoEl) {
   }
 
   // Highlight piano keys in sync — keyed by "NOTE-octave"
-  const keyEls = pianoEl ? pianoEl.querySelectorAll('.key') : [];
+  // Support both mode piano (.key) and chord piano (.cp-piano-white/black)
+  const keyEls = pianoEl ? pianoEl.querySelectorAll('[data-note][data-octave]') : [];
   const keyMap = {};
   keyEls.forEach(el => {
     const n = el.dataset.note, o = el.dataset.octave;
     if (n && o) keyMap[`${n}-${o}`] = el;
   });
+
+  // For chord piano: save lit keys and clear them so only playing note shows
+  const litKeys = pianoEl ? [...pianoEl.querySelectorAll('.cp-piano-white.lit, .cp-piano-black.lit')] : [];
+  litKeys.forEach(k => k.classList.remove('lit'));
 
   // Master gain for all scale notes — set to 0 on stop for instant silence
   const scaleGain = ctx.createGain();
@@ -2542,6 +2556,12 @@ function playScale(scaleNotes, btn, pianoEl) {
 
   const cleanup = (resume) => {
     keyEls.forEach(k => k.classList.remove('playing'));
+    // Restore lit keys on chord piano
+    litKeys.forEach(k => {
+      k.classList.remove('lit');
+      void k.offsetWidth;
+      k.classList.add('lit');
+    });
     btn.classList.remove('playing');
     btn.innerHTML = playIcon() + 'Play scale';
     playbackStop = null;
