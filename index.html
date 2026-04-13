@@ -1109,6 +1109,7 @@ const MODES = [
 let currentMode = MODES[0].modes[1]; // default: Dorian
 let currentRoot = 'C';
 let currentView = 'modes'; // 'modes' | 'chords'
+let modesListOpen = true;
 
 const CHORD_TYPES = [
   {
@@ -1427,23 +1428,35 @@ function renderSidebar() {
     renderSidebar();
   };
 
-  // Modes section — always visible at top; clicking header or any mode instantly opens it
+  // Modes section — collapsible at top
+  const chevronSvg = `<svg class="modes-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="margin-left:auto;transition:transform 0.2s;${modesListOpen ? '' : 'transform:rotate(-90deg)'}"><polyline points="2,3 5,7 8,3"/></svg>`;
   const modesHeader = document.createElement('button');
   modesHeader.className = 'sidebar-nav-btn' + (currentView === 'modes' ? ' active' : '');
-  modesHeader.innerHTML = modesIcon() + 'Modes';
-  modesHeader.onclick = () => {
-    if (playbackStop) playbackStop();
-    currentView = 'modes';
-    renderMain();
-    renderSidebar();
+  modesHeader.style.cssText = 'display:flex;align-items:center;width:100%;';
+  modesHeader.innerHTML = modesIcon() + 'Modes' + chevronSvg;
+  modesHeader.onclick = (e) => {
+    // Click on the chevron area (right half) toggles collapse; click elsewhere navigates
+    const rect = modesHeader.getBoundingClientRect();
+    if (e.clientX > rect.right - 28) {
+      modesListOpen = !modesListOpen;
+      renderSidebar();
+    } else {
+      if (playbackStop) playbackStop();
+      currentView = 'modes';
+      renderMain();
+      renderSidebar();
+    }
   };
   sidebar.appendChild(modesHeader);
+
+  const modesList = document.createElement('div');
+  modesList.style.cssText = modesListOpen ? '' : 'display:none';
 
   MODES.forEach(group => {
     const label = document.createElement('div');
     label.className = 'group-label';
     label.textContent = group.group;
-    sidebar.appendChild(label);
+    modesList.appendChild(label);
 
     group.modes.forEach(mode => {
       const btn = document.createElement('button');
@@ -1456,9 +1469,10 @@ function renderSidebar() {
         renderMain();
         renderSidebar();
       };
-      sidebar.appendChild(btn);
+      modesList.appendChild(btn);
     });
   });
+  sidebar.appendChild(modesList);
 
   nav.appendChild(cpBtn);
   nav.appendChild(chordsBtn);
@@ -1651,16 +1665,20 @@ function renderChordProgressionView() {
       titleEl.textContent = prog.name;
       titleRow.appendChild(titleEl);
 
-      const pBtn = document.createElement('button');
-      pBtn.className = 'play-btn';
-      pBtn.style.cssText = 'margin-top:0;padding:0.2rem 0.7rem;font-size:0.7rem;flex-shrink:0;';
-      pBtn.innerHTML = playIcon() + ' Play';
-      titleRow.appendChild(pBtn);
       block.appendChild(titleRow);
 
-      // ── Chord card flow ──
+      // ── Chord card flow + play button ──
+      const flowRow = document.createElement('div');
+      flowRow.style.cssText = 'display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;';
+
       const flow = document.createElement('div');
       flow.className = 'prog-flow';
+      flow.style.cssText = 'flex:1;min-width:0;';
+
+      const pBtn = document.createElement('button');
+      pBtn.className = 'play-btn';
+      pBtn.style.cssText = 'margin-top:0;padding:0.2rem 0.7rem;font-size:0.7rem;flex-shrink:0;align-self:center;';;
+      pBtn.innerHTML = playIcon() + ' Play';
 
       const cardEls = [];  // for piano update
       let activePianoEl = null;
@@ -1720,7 +1738,9 @@ function renderChordProgressionView() {
         flow.appendChild(card);
       });
 
-      block.appendChild(flow);
+      flowRow.appendChild(flow);
+      flowRow.appendChild(pBtn);
+      block.appendChild(flowRow);
 
       // ── Piano detail (shows notes of active card) ──
       const pianoWrap = document.createElement('div');
