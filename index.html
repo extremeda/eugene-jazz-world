@@ -1737,12 +1737,12 @@ function roleFor(semitone) {
 // small inline piano for a chord (1 octave + C D E, lights up chord notes)
 const CP_PIANO_WHITE = ['C','D','E','F','G','A','B'];
 const CP_PIANO_BLACK = [
-  {note:'C#',left:16},{note:'D#',left:43},
-  {note:'F#',left:99},{note:'G#',left:126},{note:'A#',left:153}
+  {note:'C#',left:15},{note:'D#',left:37},
+  {note:'F#',left:81},{note:'G#',left:103},{note:'A#',left:125}
 ];
 // 3 extra high keys (next octave: C D E + their sharps)
 const CP_EXTRA_WHITE = ['C','D','E'];
-const CP_EXTRA_BLACK = [{note:'C#',left:16},{note:'D#',left:43}];
+const CP_EXTRA_BLACK = [{note:'C#',left:15},{note:'D#',left:37}];
 const CP_KW = 22, CP_KH = 76;
 
 // Build the piano DOM; keys start unlit. Returns the outer wrapper.
@@ -1794,8 +1794,9 @@ function buildChordPiano(noteNames) {
     key.addEventListener('mousedown', e => {
       e.stopPropagation();
       const ctx = getAudioCtx();
-      const freq = NOTE_FREQ[key.dataset.note];
+      let freq = NOTE_FREQ[key.dataset.note];
       if (!freq) return;
+      if (key.dataset.octave === '5') freq *= 2;
       playNote(ctx, freq, ctx.currentTime, 0.8);
       const wasLit = key.classList.contains('lit');
       key.classList.remove('lit');
@@ -2138,8 +2139,11 @@ function renderPiano(scaleNotes, root, charIndices) {
     key.addEventListener('mousedown', e => {
       e.stopPropagation();
       const ctx = getAudioCtx();
-      const freq = NOTE_FREQ[n];
-      if (freq) playNote(ctx, freq, ctx.currentTime, 0.8);
+      let freq = NOTE_FREQ[n];
+      if (freq) {
+        if (oct === 5) freq *= 2;
+        playNote(ctx, freq, ctx.currentTime, 0.8);
+      }
       key.classList.add('playing');
       setTimeout(() => key.classList.remove('playing'), 880);
     });
@@ -2381,15 +2385,6 @@ function renderScalesView() {
       pianoTopRow.appendChild(pianoEl);
       pianoTopRow.appendChild(playBtn);
       pianoWrap.appendChild(pianoTopRow);
-      pianoEl._pianoContainer && pianoEl._pianoContainer.querySelectorAll('[data-note]').forEach(key => {
-        key.style.cursor = 'pointer';
-        key.addEventListener('mousedown', e => {
-          e.stopPropagation();
-          const ctx = getAudioCtx();
-          const freq = NOTE_FREQ[key.dataset.note];
-          if (freq) playNote(ctx, freq, ctx.currentTime, 0.8);
-        });
-      });
       card.appendChild(pianoWrap);
 
       const descEl = document.createElement('div');
