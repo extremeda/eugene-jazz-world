@@ -644,9 +644,29 @@
       border-radius: 4px;
       padding: 0.85rem 1rem;
       margin-bottom: 0.7rem;
-      position: relative;
     }
     .scale-detail-card:last-child { margin-bottom: 0; }
+    .scale-notes-row {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 0.35rem;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 0.75rem;
+    }
+    .scale-note-cell {
+      flex-shrink: 0;
+      min-width: 42px;
+      padding: 0.45rem 0.3rem;
+      text-align: center;
+      background: #151515;
+      border: 1px solid #2a2a2a;
+      border-radius: 4px;
+    }
+    .scale-note-cell.root-note { border-color: #5a4a28; }
+    .scale-note-cell .sn-name { font-size: 0.95rem; color: #e8e0d0; }
+    .scale-note-cell.root-note .sn-name { color: #c8a96e; font-weight: bold; }
+    .scale-note-cell .sn-interval { font-size: 0.6rem; color: #666; margin-top: 0.2rem; }
 
     .cp-grid {
       display: grid;
@@ -2343,11 +2363,12 @@ function renderScalesView() {
       const notesWithOctave = [...spelledNotes, spelledNotes[0]];
       const intervalsWithOctave = [...scale.intervalNames, '8'];
       const notesRow = document.createElement('div');
-      notesRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.75rem;align-items:flex-start;';
+      notesRow.className = 'scale-notes-row';
       notesWithOctave.forEach((n, i) => {
+        const isRoot = i === 0 || i === notesWithOctave.length - 1;
         const cell = document.createElement('div');
-        cell.style.cssText = 'min-width:44px;padding:0.5rem 0.3rem;text-align:center;background:#151515;border:1px solid #2a2a2a;border-radius:4px;flex-shrink:0;' + (i === 0 || i === notesWithOctave.length - 1 ? 'border-color:#5a4a28;' : '');
-        cell.innerHTML = `<div style="font-size:1rem;color:${i === 0 || i === notesWithOctave.length - 1 ? '#c8a96e' : '#e8e0d0'};">${n}</div><div style="font-size:0.62rem;color:#666;margin-top:0.2rem;">${intervalsWithOctave[i]}</div>`;
+        cell.className = 'scale-note-cell' + (isRoot ? ' root-note' : '');
+        cell.innerHTML = `<div class="sn-name">${n}</div><div class="sn-interval">${intervalsWithOctave[i]}</div>`;
         notesRow.appendChild(cell);
       });
       card.appendChild(notesRow);
