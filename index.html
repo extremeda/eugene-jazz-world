@@ -2334,24 +2334,7 @@ function renderScalesView() {
       nameEl.style.cssText = 'font-size:1rem;color:#e8e0d0;font-weight:600;';
       nameEl.textContent = `${root} ${scale.name}`;
 
-      const playBtn = document.createElement('button');
-      playBtn.className = 'chord-play-btn';
-      playBtn.innerHTML = playIcon();
-      playBtn.title = 'Play scale';
-      playBtn.onclick = () => {
-        const ctx = getAudioCtx();
-        const now = ctx.currentTime;
-        const step = 0.22;
-        // ascending + octave root + descending
-        const ascDesc = [...notes, notes[0], ...[...notes].reverse()];
-        ascDesc.forEach((n, i) => {
-          const freq = NOTE_FREQ[n] * (i >= notes.length ? 2 : 1);
-          playNote(ctx, freq, now + i * step, 0.45);
-        });
-      };
-
       topRow.appendChild(nameEl);
-      topRow.appendChild(playBtn);
       card.appendChild(topRow);
 
       const soundEl = document.createElement('div');
@@ -2373,11 +2356,29 @@ function renderScalesView() {
       });
       card.appendChild(notesRow);
 
-      // Piano keyboard
+      // Piano keyboard + play button
       const pianoWrap = document.createElement('div');
-      pianoWrap.style.cssText = 'margin-bottom:0.75rem;overflow-x:auto;';
+      pianoWrap.style.cssText = 'margin-bottom:0.75rem;';
+      const pianoTopRow = document.createElement('div');
+      pianoTopRow.style.cssText = 'display:flex;align-items:center;gap:50px;';
       const pianoEl = buildChordPiano(notes);
-      pianoWrap.appendChild(pianoEl);
+      const playBtn = document.createElement('button');
+      playBtn.className = 'play-btn';
+      playBtn.style.cssText = 'margin-top:0;flex-shrink:0;';
+      playBtn.innerHTML = playIcon() + 'Play scale';
+      playBtn.onclick = () => {
+        const ctx = getAudioCtx();
+        const now = ctx.currentTime;
+        const step = 0.22;
+        const ascDesc = [...notes, notes[0], ...[...notes].reverse()];
+        ascDesc.forEach((n, i) => {
+          const freq = NOTE_FREQ[n] * (i >= notes.length ? 2 : 1);
+          playNote(ctx, freq, now + i * step, 0.45);
+        });
+      };
+      pianoTopRow.appendChild(pianoEl);
+      pianoTopRow.appendChild(playBtn);
+      pianoWrap.appendChild(pianoTopRow);
       pianoEl._pianoContainer && pianoEl._pianoContainer.querySelectorAll('[data-note]').forEach(key => {
         key.style.cursor = 'pointer';
         key.addEventListener('mousedown', e => {
