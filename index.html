@@ -379,6 +379,8 @@
     .play-btn svg { flex-shrink: 0; }
 
     .key.playing { background: #5a8a9a !important; border-color: #7eb8c9 !important; transition: background 0.05s; }
+    .piano.piano-playing .key.white:not(.playing) { background: #f0f0f0 !important; border-color: #aaa !important; }
+    .piano.piano-playing .key.black:not(.playing) { background: #222 !important; border-color: #000 !important; }
 
     .chord-card {
       position: relative;
@@ -2138,6 +2140,8 @@ function renderPiano(scaleNotes, root, charIndices) {
       const ctx = getAudioCtx();
       const freq = NOTE_FREQ[n];
       if (freq) playNote(ctx, freq, ctx.currentTime, 0.8);
+      key.classList.add('playing');
+      setTimeout(() => key.classList.remove('playing'), 880);
     });
     return key;
   }
@@ -2509,6 +2513,10 @@ function playScale(scaleNotes, btn, pianoEl) {
   const litKeys = pianoEl ? [...pianoEl.querySelectorAll('.cp-piano-white.lit, .cp-piano-black.lit')] : [];
   litKeys.forEach(k => k.classList.remove('lit'));
 
+  // For mode piano: add piano-playing class to dim all colored keys
+  const modePiano = pianoEl ? pianoEl.querySelector('.piano') || (pianoEl.classList.contains('piano') ? pianoEl : null) : null;
+  if (modePiano) modePiano.classList.add('piano-playing');
+
   // Master gain for all scale notes — set to 0 on stop for instant silence
   const scaleGain = ctx.createGain();
   scaleGain.gain.setValueAtTime(1, now);
@@ -2562,6 +2570,8 @@ function playScale(scaleNotes, btn, pianoEl) {
       void k.offsetWidth;
       k.classList.add('lit');
     });
+    // Restore mode piano colors
+    if (modePiano) modePiano.classList.remove('piano-playing');
     btn.classList.remove('playing');
     btn.innerHTML = playIcon() + 'Play scale';
     playbackStop = null;
