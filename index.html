@@ -636,29 +636,6 @@
     .cp-card .cp-notes-txt { font-size: 0.63rem; color: #777; margin-top: 0.1rem; }
     .cp-card .cp-desc { font-size: 0.62rem; color: #7a9a7a; margin-top: 0.35rem; line-height: 1.4; }
 
-    /* Scales view */
-    .scales-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 0.6rem;
-    }
-    .scale-card {
-      background: #111;
-      border: 1px solid #222;
-      border-radius: 4px;
-      padding: 0.65rem 0.9rem 0.6rem;
-      position: relative;
-      cursor: pointer;
-      transition: border-color 0.15s;
-    }
-    .scale-card:hover { border-color: #c8a96e; }
-    .scale-card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.2rem; }
-    .scale-name { font-size: 0.95rem; color: #e8e0d0; font-weight: 600; }
-    .scale-degree { font-size: 0.7rem; color: #c8a96e; }
-    .scale-sound { font-size: 0.68rem; color: #8ab87a; margin-bottom: 0.2rem; font-style: italic; }
-    .scale-notes { font-size: 0.62rem; color: #777; margin-bottom: 0.2rem; }
-    .scale-parent { font-size: 0.6rem; color: #555; }
-
     .prog-row {
       background: #111;
       border: 1px solid #222;
@@ -1057,54 +1034,6 @@ const MODES = [
         description: 'The ultimate dominant tension scale — contains b9, #9, b5/#11, AND b13 simultaneously. Used over altered dominant chords (V7alt) to create maximum tension before resolving. The "super-Locrian" mode.',
         usage: ['V7alt — altered dominant before resolution', 'Bebop and post-bop dominant lines', 'Maximum tension in II–V–I'],
         examples: ['Countdown — Coltrane', 'Giant Steps substitutions', 'Any bebop V7alt chord'],
-      },
-    ]
-  },
-  {
-    group: 'Symmetric Scales',
-    modes: [
-      {
-        name: 'Whole Tone', degree: '—', parent: 'Whole Tone Scale',
-        intervals: [0,2,4,6,8,10],
-        intervalNames: ['1','2','3','#4','#5','b7'],
-        characteristic: [6], charDesc: '#4 and #5 simultaneously — every interval is a whole step, removing all half-step gravity and making the scale feel directionless',
-        sound: 'Floating, ambiguous, Debussy',
-        chords: [
-          { name: 'C7#5', notes: 'C E G# Bb', fn: 'V7aug', semitones: [0,4,8,10] },
-          { name: 'C7#5#11', notes: 'C E G# Bb F#', fn: 'V7#5#11', semitones: [0,4,8,10,18] },
-        ],
-        description: 'Six equal whole steps — completely symmetrical. Has no half steps, so it feels directionless and floating. Used over augmented dominant 7th chords (7#5). Only 2 transpositions exist.',
-        usage: ['Dominant 7th#5 chords', 'Impressionistic floating passages', 'Dominant without resolution pull'],
-        examples: ['Debussy (classical origin)', 'Wayne Shorter\'s augmented chords', 'Bill Evans impressionistic passages'],
-      },
-      {
-        name: 'Diminished (H-W)', degree: '—', parent: 'Octatonic Scale',
-        intervals: [0,1,3,4,6,7,9,10],
-        intervalNames: ['1','b2','b3','3','b5','5','6','b7'],
-        characteristic: [1],
-        sound: 'Tense, symmetrical tension',
-        chords: [
-          { name: 'C7b9', notes: 'C E G Bb Db', fn: 'V7b9', semitones: [0,4,7,10,13] },
-          { name: 'C7b9#11', notes: 'C E G Bb Db F#', fn: 'V7b9#11', semitones: [0,4,7,10,13,18] },
-          { name: 'C13b9', notes: 'C E G Bb Db A', fn: 'V13b9', semitones: [0,4,7,10,13,21] },
-        ],
-        description: 'The half-whole diminished — starts with a half step. Used over dominant 7th chords with b9. Contains both the chord tones AND all the altered tensions in an 8-note pattern. 3 transpositions exist.',
-        usage: ['V7b9 dominant chords', 'Bebop dominant lines', 'Symmetric tension over dominants'],
-        examples: ['Bebop lines on V7', 'Coltrane\'s "inside-outside" playing', 'Joe Pass dominant lines'],
-      },
-      {
-        name: 'Diminished (W-H)', degree: '—', parent: 'Octatonic Scale',
-        intervals: [0,2,3,5,6,8,9,11],
-        intervalNames: ['1','2','b3','4','b5','#5','6','7'],
-        characteristic: [6],
-        sound: 'Diminished chord extensions',
-        chords: [
-          { name: 'Cdim7', notes: 'C Eb Gb A', fn: 'dim7', semitones: [0,3,6,9] },
-          { name: 'Cdim7add9', notes: 'C Eb Gb A D', fn: 'dim7add9', semitones: [0,3,6,9,14] },
-        ],
-        description: 'The whole-half diminished — starts with a whole step. Used over diminished 7th chords. Its symmetry means a Cdim7 scale works equally over Ebdim7, Gbdim7, and Adim7.',
-        usage: ['Diminished 7th chords', 'Passing diminished chords', 'Connecting diatonic chords'],
-        examples: ['Rhythm changes bridge', 'Passing dim chords in standards', 'Bebop passing tones'],
       },
     ]
   },
@@ -1511,19 +1440,8 @@ function renderSidebar() {
     });
   });
 
-  const scalesBtn = document.createElement('button');
-  scalesBtn.className = 'sidebar-nav-btn' + (currentView === 'scales' ? ' active' : '');
-  scalesBtn.innerHTML = modesIcon() + 'Scales';
-  scalesBtn.onclick = () => {
-    if (playbackStop) playbackStop();
-    currentView = 'scales';
-    renderScalesView();
-    renderSidebar();
-  };
-
   nav.appendChild(cpBtn);
   nav.appendChild(chordsBtn);
-  nav.appendChild(scalesBtn);
   sidebar.appendChild(nav);
 
   // Mobile dropdown — rebuild options, keep selected in sync
@@ -2110,78 +2028,6 @@ function renderMain() {
   main.appendChild(exSection);
 }
 
-const SCALES_EXCLUDE = new Set(['Modes of the Major Scale', 'Melodic Minor Modes', 'Blues & Pentatonic']);
-
-function renderScalesView() {
-  const main = document.getElementById('main');
-  main.innerHTML = '';
-  const root = currentRoot;
-
-  const header = document.createElement('div');
-  header.className = 'mode-header';
-  header.innerHTML = `
-    <h2>Scales</h2>
-    <div class="parent">Root: <strong style="color:#c8a96e">${root}</strong> &nbsp;·&nbsp; All scales transposed</div>
-    <div class="sound-tag">Symmetric · Exotic · Non-diatonic</div>
-  `;
-  main.appendChild(header);
-
-  MODES.filter(g => !SCALES_EXCLUDE.has(g.group)).forEach(group => {
-    const section = document.createElement('div');
-    section.className = 'cp-section';
-
-    const title = document.createElement('div');
-    title.className = 'cp-section-title';
-    title.textContent = group.group;
-    section.appendChild(title);
-
-    const grid = document.createElement('div');
-    grid.className = 'scales-grid';
-
-    group.modes.forEach(mode => {
-      const scaleNotes = mode.intervals.map(iv => CHROMATIC[(CHROMATIC.indexOf(root) + iv) % 12]);
-      const spelledScale = getSpelledScale(root, mode.intervals, mode.intervalNames);
-
-      const card = document.createElement('div');
-      card.className = 'scale-card';
-      card.title = 'View detail';
-
-      card.innerHTML = `
-        <div class="scale-card-header">
-          <span class="scale-name">${root} ${mode.name}</span>
-          <span class="scale-degree">${mode.degree}</span>
-        </div>
-        <div class="scale-sound">${mode.sound}</div>
-        <div class="scale-notes">${spelledScale.join(' · ')}</div>
-        <div class="scale-parent">${mode.parent}</div>
-      `;
-
-      const playBtn = document.createElement('button');
-      playBtn.className = 'chord-play-btn';
-      playBtn.innerHTML = playIcon();
-      playBtn.title = 'Play scale';
-      playBtn.onclick = e => {
-        e.stopPropagation();
-        playScale(scaleNotes, playBtn, null);
-      };
-      card.appendChild(playBtn);
-
-      card.addEventListener('click', () => {
-        if (playbackStop) playbackStop();
-        currentView = 'modes';
-        currentMode = mode;
-        renderMain();
-        renderSidebar();
-      });
-
-      grid.appendChild(card);
-    });
-
-    section.appendChild(grid);
-    main.appendChild(section);
-  });
-}
-
 document.getElementById('rootSelect').addEventListener('change', e => {
   const val = e.target.value;
   if (val.includes('/')) {
@@ -2191,7 +2037,6 @@ document.getElementById('rootSelect').addEventListener('change', e => {
   }
   if (currentView === 'chords') renderChordProgressionView();
   else if (currentView === 'chordtypes') renderChordTypesView();
-  else if (currentView === 'scales') renderScalesView();
   else renderMain();
 });
 
