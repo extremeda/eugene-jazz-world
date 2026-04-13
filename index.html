@@ -2333,15 +2333,34 @@ function renderScalesView() {
       soundEl.textContent = scale.sound;
       card.appendChild(soundEl);
 
-      const notesEl = document.createElement('div');
-      notesEl.style.cssText = 'display:flex;flex-wrap:wrap;gap:0.25rem;margin-bottom:0.4rem;';
+      // Note cells
+      const notesRow = document.createElement('div');
+      notesRow.className = 'notes-row';
+      notesRow.style.cssText = 'margin-bottom:0.75rem;';
       spelledNotes.forEach((n, i) => {
-        const pill = document.createElement('span');
-        pill.style.cssText = `font-size:0.7rem;color:#c8a96e;background:#1a1508;border:1px solid #3a3020;border-radius:4px;padding:0.1rem 0.4rem;white-space:nowrap;`;
-        pill.textContent = `${n} (${scale.intervalNames[i]})`;
-        notesEl.appendChild(pill);
+        const cell = document.createElement('div');
+        cell.className = 'note-cell' + (i === 0 ? ' root' : '');
+        cell.innerHTML = `<div class="note-name">${n}</div><div class="interval">${scale.intervalNames[i]}</div>`;
+        notesRow.appendChild(cell);
       });
-      card.appendChild(notesEl);
+      card.appendChild(notesRow);
+
+      // Piano keyboard
+      const pianoWrap = document.createElement('div');
+      pianoWrap.style.cssText = 'margin-bottom:0.75rem;overflow-x:auto;';
+      const pianoEl = buildChordPiano(notes);
+      pianoWrap.appendChild(pianoEl);
+      // Make keys clickable
+      pianoEl._pianoContainer && pianoEl._pianoContainer.querySelectorAll('[data-note]').forEach(key => {
+        key.style.cursor = 'pointer';
+        key.addEventListener('mousedown', e => {
+          e.stopPropagation();
+          const ctx = getAudioCtx();
+          const freq = NOTE_FREQ[key.dataset.note];
+          if (freq) playNote(ctx, freq, ctx.currentTime, 0.8);
+        });
+      });
+      card.appendChild(pianoWrap);
 
       const descEl = document.createElement('div');
       descEl.style.cssText = 'font-size:0.72rem;color:#999;line-height:1.6;margin-bottom:0.4rem;';
