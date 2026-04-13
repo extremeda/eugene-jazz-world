@@ -1586,6 +1586,19 @@ function buildChordPiano(noteNames) {
     container.appendChild(key);
   });
 
+  // Click to play note
+  container.querySelectorAll('[data-note]').forEach(key => {
+    key.style.cursor = 'pointer';
+    key.addEventListener('mousedown', e => {
+      e.stopPropagation();
+      const ctx = getAudioCtx();
+      const freq = NOTE_FREQ[key.dataset.note];
+      if (freq) playNote(ctx, freq, ctx.currentTime, 0.8);
+      key.classList.add('lit');
+      setTimeout(() => key.classList.remove('lit'), 300);
+    });
+  });
+
   const wrapper = document.createElement('div');
   wrapper.style.cssText = 'overflow-x:auto;overflow-y:hidden;padding-bottom:4px;height:88px;';
   wrapper.appendChild(container);
@@ -1915,6 +1928,13 @@ function renderPiano(scaleNotes, root, charIndices) {
       label.textContent = n;
       key.appendChild(label);
     }
+    key.style.cursor = 'pointer';
+    key.addEventListener('mousedown', e => {
+      e.stopPropagation();
+      const ctx = getAudioCtx();
+      const freq = NOTE_FREQ[n];
+      if (freq) playNote(ctx, freq, ctx.currentTime, 0.8);
+    });
     return key;
   }
 
