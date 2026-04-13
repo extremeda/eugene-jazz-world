@@ -608,7 +608,7 @@
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: #555;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0;
     }
 
     /* Piano key press animation */
@@ -1739,16 +1739,19 @@ function renderChordProgressionView() {
       });
 
       flowRow.appendChild(flow);
-      flowRow.appendChild(pBtn);
       block.appendChild(flowRow);
 
       // ── Piano detail (shows notes of active card) ──
       const pianoWrap = document.createElement('div');
       pianoWrap.className = 'prog-detail-piano';
+      const pianoTopRow = document.createElement('div');
+      pianoTopRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:0.3rem;';
       const pianoLabel = document.createElement('div');
       pianoLabel.className = 'prog-detail-piano-label';
       pianoLabel.textContent = 'Keyboard';
-      pianoWrap.appendChild(pianoLabel);
+      pianoTopRow.appendChild(pianoLabel);
+      pianoTopRow.appendChild(pBtn);
+      pianoWrap.appendChild(pianoTopRow);
       // Start with a blank piano (no lit keys until something plays or is clicked)
       const pianoEl = buildChordPiano([]);
       pianoWrap.appendChild(pianoEl);
