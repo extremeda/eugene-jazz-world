@@ -640,7 +640,7 @@
     }
     .cp-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 0.5rem;
     }
     .cp-card {
@@ -654,6 +654,31 @@
     .cp-card .cp-type { font-size: 0.68rem; color: #888; margin-top: 0.1rem; }
     .cp-card .cp-formula { font-size: 0.63rem; color: #666; margin-top: 0.1rem; font-style: italic; }
     .cp-card .cp-notes-txt { font-size: 0.63rem; color: #777; margin-top: 0.1rem; }
+    .cp-card .cp-desc { font-size: 0.62rem; color: #7a9a7a; margin-top: 0.35rem; line-height: 1.4; }
+
+    /* Scales view */
+    .scales-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0.6rem;
+    }
+    .scale-card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 4px;
+      padding: 0.65rem 0.9rem 0.6rem;
+      position: relative;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .scale-card:hover { border-color: #c8a96e; }
+    .scale-card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.2rem; }
+    .scale-name { font-size: 0.95rem; color: #e8e0d0; font-weight: 600; }
+    .scale-degree { font-size: 0.7rem; color: #c8a96e; }
+    .scale-sound { font-size: 0.68rem; color: #8ab87a; margin-bottom: 0.2rem; font-style: italic; }
+    .scale-notes { font-size: 0.62rem; color: #777; margin-bottom: 0.2rem; }
+    .scale-parent { font-size: 0.6rem; color: #555; }
+
     .prog-row {
       background: #111;
       border: 1px solid #222;
@@ -1160,109 +1185,109 @@ const CHORD_TYPES = [
   {
     group: 'Triads',
     chords: [
-      { type: 'Major',      suffix: '',      formula: '1–3–5',    semitones: [0,4,7] },
-      { type: 'Minor',      suffix: 'm',     formula: '1–b3–5',   semitones: [0,3,7] },
-      { type: 'Augmented',  suffix: 'aug',   formula: '1–3–#5',   semitones: [0,4,8] },
-      { type: 'Diminished', suffix: 'dim',   formula: '1–b3–b5',  semitones: [0,3,6] },
-      { type: 'Sus2',       suffix: 'sus2',  formula: '1–2–5',    semitones: [0,2,7] },
-      { type: 'Sus4',       suffix: 'sus4',  formula: '1–4–5',    semitones: [0,5,7] },
+      { type: 'Major',      suffix: '',      formula: '1–3–5',    semitones: [0,4,7], desc: 'Bright and stable. The foundation of Western harmony — natural resting point in major keys.' },
+      { type: 'Minor',      suffix: 'm',     formula: '1–b3–5',   semitones: [0,3,7], desc: 'Darker and more introspective than major. The flat 3rd gives it an emotional, melancholic quality.' },
+      { type: 'Augmented',  suffix: 'aug',   formula: '1–3–#5',   semitones: [0,4,8], desc: 'Unstable and tense. The raised 5th creates ambiguity — it wants to resolve. Common as a passing chord.' },
+      { type: 'Diminished', suffix: 'dim',   formula: '1–b3–b5',  semitones: [0,3,6], desc: 'Maximum tension — both the 3rd and 5th are lowered. Used as a passing or leading-tone chord.' },
+      { type: 'Sus2',       suffix: 'sus2',  formula: '1–2–5',    semitones: [0,2,7], desc: 'Open and airy. Replacing the 3rd with a 2nd removes major/minor ambiguity — floats without committing.' },
+      { type: 'Sus4',       suffix: 'sus4',  formula: '1–4–5',    semitones: [0,5,7], desc: 'Suspended tension. The 4th wants to resolve down to the 3rd. Classic in gospel and rock.' },
     ]
   },
   {
     group: '6th Chords',
     chords: [
-      { type: 'Major 6',    suffix: '6',     formula: '1–3–5–6',      semitones: [0,4,7,9]    },
-      { type: 'Minor 6',    suffix: 'm6',    formula: '1–b3–5–6',     semitones: [0,3,7,9]    },
-      { type: '6/9',        suffix: '6/9',   formula: '1–3–5–6–9',    semitones: [0,4,7,9,14] },
-      { type: 'Minor 6/9',  suffix: 'm6/9',  formula: '1–b3–5–6–9',   semitones: [0,3,7,9,14] },
+      { type: 'Major 6',    suffix: '6',     formula: '1–3–5–6',      semitones: [0,4,7,9],    desc: 'Warm and complete. Adding the major 6th to a major triad gives a nostalgic, jazz-pop sweetness.' },
+      { type: 'Minor 6',    suffix: 'm6',    formula: '1–b3–5–6',     semitones: [0,3,7,9],    desc: 'Bittersweet and sophisticated. The major 6th over a minor chord creates a subtle, complex tension — a Dorian sound.' },
+      { type: '6/9',        suffix: '6/9',   formula: '1–3–5–6–9',    semitones: [0,4,7,9,14], desc: 'Lush and colorful. Adding both the 6th and 9th to a major chord — no 7th, so it feels open and bright.' },
+      { type: 'Minor 6/9',  suffix: 'm6/9',  formula: '1–b3–5–6–9',   semitones: [0,3,7,9,14], desc: 'Rich and exotic. Minor with both 6th and 9th — a favorite in jazz ballads for its layered emotional depth.' },
     ]
   },
   {
     group: '7th Chords',
     chords: [
-      { type: 'Major 7',        suffix: 'maj7',     formula: '1–3–5–7',      semitones: [0,4,7,11]  },
-      { type: 'Dominant 7',     suffix: '7',        formula: '1–3–5–b7',     semitones: [0,4,7,10]  },
-      { type: 'Minor 7',        suffix: 'm7',       formula: '1–b3–5–b7',    semitones: [0,3,7,10]  },
-      { type: 'Half-Dim (ø7)',  suffix: 'ø7',       formula: '1–b3–b5–b7',   semitones: [0,3,6,10]  },
-      { type: 'Diminished 7',   suffix: 'dim7',     formula: '1–b3–b5–bb7',  semitones: [0,3,6,9]   },
-      { type: 'Minor-Major 7',  suffix: 'mMaj7',    formula: '1–b3–5–7',     semitones: [0,3,7,11]  },
-      { type: 'Augmented 7',    suffix: 'aug7',     formula: '1–3–#5–b7',    semitones: [0,4,8,10]  },
-      { type: 'Aug Major 7',    suffix: 'augMaj7',  formula: '1–3–#5–7',     semitones: [0,4,8,11]  },
-      { type: 'Dom 7sus4',      suffix: '7sus4',    formula: '1–4–5–b7',     semitones: [0,5,7,10]  },
-      { type: 'Dom 7sus2',      suffix: '7sus2',    formula: '1–2–5–b7',     semitones: [0,2,7,10]  },
-      { type: 'Dom 7b5',        suffix: '7b5',      formula: '1–3–b5–b7',    semitones: [0,4,6,10]  },
-      { type: 'Major 7b5',      suffix: 'maj7b5',   formula: '1–3–b5–7',     semitones: [0,4,6,11]  },
+      { type: 'Major 7',        suffix: 'maj7',     formula: '1–3–5–7',      semitones: [0,4,7,11],  desc: 'Dreamy and stable. The major 7th adds elegance without tension — the quintessential jazz ballad tonic chord.' },
+      { type: 'Dominant 7',     suffix: '7',        formula: '1–3–5–b7',     semitones: [0,4,7,10],  desc: 'The engine of harmony. The tritone between 3 and b7 creates irresistible pull toward resolution — the V7 chord.' },
+      { type: 'Minor 7',        suffix: 'm7',       formula: '1–b3–5–b7',    semitones: [0,3,7,10],  desc: 'Cool and dark. The workhorse of jazz minor — used on IIm7 and IIIm7 in II–V–I progressions.' },
+      { type: 'Half-Dim (ø7)',  suffix: 'ø7',       formula: '1–b3–b5–b7',   semitones: [0,3,6,10],  desc: 'Tense and unstable. The IIø7 in minor II–V–I progressions — diminished triad with a minor (not double-flat) 7th.' },
+      { type: 'Diminished 7',   suffix: 'dim7',     formula: '1–b3–b5–bb7',  semitones: [0,3,6,9],   desc: 'Symmetric and eerie. All intervals are minor 3rds — it can resolve to four different keys, making it a versatile passing chord.' },
+      { type: 'Minor-Major 7',  suffix: 'mMaj7',    formula: '1–b3–5–7',     semitones: [0,3,7,11],  desc: 'Bittersweet and tense. The "James Bond" sound — minor chord with a major 7th clashing above it.' },
+      { type: 'Augmented 7',    suffix: 'aug7',     formula: '1–3–#5–b7',    semitones: [0,4,8,10],  desc: 'Unstable dominant color. The raised 5th adds an extra pull alongside the tritone — useful for chromatic motion.' },
+      { type: 'Aug Major 7',    suffix: 'augMaj7',  formula: '1–3–#5–7',     semitones: [0,4,8,11],  desc: 'Exotic and highly dissonant. Both the #5 and major 7th create ambiguous tension — rare, from melodic minor harmony.' },
+      { type: 'Dom 7sus4',      suffix: '7sus4',    formula: '1–4–5–b7',     semitones: [0,5,7,10],  desc: 'Floating dominant. Suspending the 3rd with a 4th delays resolution — common in funk, gospel, and modern jazz.' },
+      { type: 'Dom 7sus2',      suffix: '7sus2',    formula: '1–2–5–b7',     semitones: [0,2,7,10],  desc: 'Open and airy dominant. The 2nd instead of the 3rd gives a transparent, unresolved quality over V chords.' },
+      { type: 'Dom 7b5',        suffix: '7b5',      formula: '1–3–b5–b7',    semitones: [0,4,6,10],  desc: 'Sharp and tense. Two tritones — the standard tritone plus b5 vs. 1 — maximum instability in a dominant.' },
+      { type: 'Major 7b5',      suffix: 'maj7b5',   formula: '1–3–b5–7',     semitones: [0,4,6,11],  desc: 'Exotic and dreamy. The flat 5 undermines the stability of the major 7 chord — sounds modern and ambiguous.' },
     ]
   },
   {
     group: '9th Chords',
     chords: [
-      { type: 'Major 9',       suffix: 'maj9',     formula: '1–3–5–7–9',      semitones: [0,4,7,11,14]    },
-      { type: 'Dominant 9',    suffix: '9',        formula: '1–3–5–b7–9',     semitones: [0,4,7,10,14]    },
-      { type: 'Minor 9',       suffix: 'm9',       formula: '1–b3–5–b7–9',    semitones: [0,3,7,10,14]    },
-      { type: 'Minor-Major 9', suffix: 'mMaj9',    formula: '1–b3–5–7–9',     semitones: [0,3,7,11,14]    },
-      { type: 'Add9',          suffix: 'add9',     formula: '1–3–5–9',        semitones: [0,4,7,14]       },
-      { type: 'Minor Add9',    suffix: 'm(add9)',  formula: '1–b3–5–9',       semitones: [0,3,7,14]       },
-      { type: '7b9',           suffix: '7b9',      formula: '1–3–5–b7–b9',    semitones: [0,4,7,10,13]    },
-      { type: '7#9',           suffix: '7#9',      formula: '1–3–5–b7–#9',    semitones: [0,4,7,10,15]    },
-      { type: '9sus4',         suffix: '9sus4',    formula: '1–4–5–b7–9',     semitones: [0,5,7,10,14]    },
-      { type: '9#11',          suffix: '9#11',     formula: '1–3–5–b7–9–#11', semitones: [0,4,7,10,14,18] },
-      { type: 'Maj9 #11',      suffix: 'maj9#11',  formula: '1–3–5–7–9–#11',  semitones: [0,4,7,11,14,18] },
-      { type: '7b9 #11',       suffix: '7b9#11',   formula: '1–3–5–b7–b9–#11',semitones: [0,4,7,10,13,18] },
-      { type: '7#9 #11',       suffix: '7#9#11',   formula: '1–3–5–b7–#9–#11',semitones: [0,4,7,10,15,18] },
+      { type: 'Major 9',       suffix: 'maj9',     formula: '1–3–5–7–9',      semitones: [0,4,7,11,14],    desc: 'Lush and bright. Adding the 9th to maj7 opens the sound up — warm, full, and very jazz.' },
+      { type: 'Dominant 9',    suffix: '9',        formula: '1–3–5–b7–9',     semitones: [0,4,7,10,14],    desc: 'Rich dominant color. The 9th adds sweetness on top of the V7 tension — great for soulful resolutions.' },
+      { type: 'Minor 9',       suffix: 'm9',       formula: '1–b3–5–b7–9',    semitones: [0,3,7,10,14],    desc: 'Sophisticated minor. The added 9th lifts the minor 7th into a more open, expressive space.' },
+      { type: 'Minor-Major 9', suffix: 'mMaj9',    formula: '1–b3–5–7–9',     semitones: [0,3,7,11,14],    desc: 'Complex and cinematic. mMaj7 with a 9th — layers the bittersweet major 7 clash with an airy extension.' },
+      { type: 'Add9',          suffix: 'add9',     formula: '1–3–5–9',        semitones: [0,4,7,14],       desc: 'Bright and simple. A major triad with a 9th but no 7th — adds color without jazz complexity. Pop-friendly.' },
+      { type: 'Minor Add9',    suffix: 'm(add9)',  formula: '1–b3–5–9',       semitones: [0,3,7,14],       desc: 'Tender and open. Minor triad with a 9th but no 7th — emotional without heaviness. Common in film scores.' },
+      { type: '7b9',           suffix: '7b9',      formula: '1–3–5–b7–b9',    semitones: [0,4,7,10,13],    desc: 'Dark and urgent. The flat 9 adds strong tension on a dominant — especially powerful resolving to minor chords.' },
+      { type: '7#9',           suffix: '7#9',      formula: '1–3–5–b7–#9',    semitones: [0,4,7,10,15],    desc: 'The "Hendrix chord." The #9 sounds like a minor note clashing against the major 3rd — aggressive and bluesy.' },
+      { type: '9sus4',         suffix: '9sus4',    formula: '1–4–5–b7–9',     semitones: [0,5,7,10,14],    desc: 'Floating and modern. Sus4 tension combined with a 9th — open, unresolved, popular in contemporary jazz.' },
+      { type: '9#11',          suffix: '9#11',     formula: '1–3–5–b7–9–#11', semitones: [0,4,7,10,14,18], desc: 'Lydian dominant sound. The #11 adds a dreamy, floating quality on top of a dominant 9th — Herbie Hancock territory.' },
+      { type: 'Maj9 #11',      suffix: 'maj9#11',  formula: '1–3–5–7–9–#11',  semitones: [0,4,7,11,14,18], desc: 'Lydian major sound. The #11 on a maj9 chord creates a shimmering, unresolved brightness — cinematic and ethereal.' },
+      { type: '7b9 #11',       suffix: '7b9#11',   formula: '1–3–5–b7–b9–#11',semitones: [0,4,7,10,13,18], desc: 'Dense and dissonant. Combines the dark tension of b9 with the floating #11 — a bebop favorite over V chords.' },
+      { type: '7#9 #11',       suffix: '7#9#11',   formula: '1–3–5–b7–#9–#11',semitones: [0,4,7,10,15,18], desc: 'Highly altered dominant. Stacks the clashing #9 with the floating #11 — maximum tension before resolution.' },
     ]
   },
   {
     group: '11th Chords',
     chords: [
-      { type: 'Minor 11',    suffix: 'm11',   formula: '1–b3–5–b7–9–11',  semitones: [0,3,7,10,14,17] },
-      { type: 'Dominant 11', suffix: '11',    formula: '1–5–b7–9–11',     semitones: [0,7,10,14,17]   },
-      { type: 'Major 11',    suffix: 'maj11', formula: '1–5–7–9–11',      semitones: [0,7,11,14,17]   },
+      { type: 'Minor 11',    suffix: 'm11',   formula: '1–b3–5–b7–9–11',  semitones: [0,3,7,10,14,17], desc: 'Full and atmospheric minor. Stacking up to the 11th gives a rich, modal quality — the Dorian sound fully voiced.' },
+      { type: 'Dominant 11', suffix: '11',    formula: '1–5–b7–9–11',     semitones: [0,7,10,14,17],   desc: 'Suspended dominant. The 11th effectively replaces the 3rd (they clash) — sounds open and unresolved over V.' },
+      { type: 'Major 11',    suffix: 'maj11', formula: '1–5–7–9–11',      semitones: [0,7,11,14,17],   desc: 'Ethereal and complex. The 11 against the major 7 and 3 creates a dense cluster — mostly used without the 3rd.' },
     ]
   },
   {
     group: '13th Chords',
     chords: [
-      { type: 'Major 13',       suffix: 'maj13',    formula: '1–3–5–7–9–13',       semitones: [0,4,7,11,14,21]    },
-      { type: 'Dominant 13',    suffix: '13',       formula: '1–3–5–b7–9–13',      semitones: [0,4,7,10,14,21]    },
-      { type: 'Minor 13',       suffix: 'm13',      formula: '1–b3–5–b7–9–13',     semitones: [0,3,7,10,14,21]    },
-      { type: 'Minor-Major 13', suffix: 'mMaj13',   formula: '1–b3–5–7–9–13',      semitones: [0,3,7,11,14,21]    },
-      { type: '13b9',           suffix: '13b9',     formula: '1–3–5–b7–b9–13',     semitones: [0,4,7,10,13,21]    },
-      { type: '13#9',           suffix: '13#9',     formula: '1–3–5–b7–#9–13',     semitones: [0,4,7,10,15,21]    },
-      { type: '13#11',          suffix: '13#11',    formula: '1–3–5–b7–9–#11–13',  semitones: [0,4,7,10,14,18,21] },
-      { type: '13b9 #11',       suffix: '13b9#11',  formula: '1–3–5–b7–b9–#11–13', semitones: [0,4,7,10,13,18,21] },
-      { type: 'Major 13#11',    suffix: 'maj13#11', formula: '1–3–5–7–9–#11–13',   semitones: [0,4,7,11,14,18,21] },
+      { type: 'Major 13',       suffix: 'maj13',    formula: '1–3–5–7–9–13',       semitones: [0,4,7,11,14,21],    desc: 'The full major sound. All diatonic notes stacked — rich, complete, and stable. The final word in major.' },
+      { type: 'Dominant 13',    suffix: '13',       formula: '1–3–5–b7–9–13',      semitones: [0,4,7,10,14,21],    desc: 'Warm, full dominant. Adding the 13th softens the V7 slightly — lush and soulful, pulls strongly to resolution.' },
+      { type: 'Minor 13',       suffix: 'm13',      formula: '1–b3–5–b7–9–13',     semitones: [0,3,7,10,14,21],    desc: 'Sophisticated minor. The natural 13 (same as major 6) over minor gives a Dorian color — refined and jazzy.' },
+      { type: 'Minor-Major 13', suffix: 'mMaj13',   formula: '1–b3–5–7–9–13',      semitones: [0,3,7,11,14,21],    desc: 'Layered complexity. mMaj7 extended to the 13th — the bittersweet major 7 tension wrapped in a full extension.' },
+      { type: '13b9',           suffix: '13b9',     formula: '1–3–5–b7–b9–13',     semitones: [0,4,7,10,13,21],    desc: 'Dark dominant color. b9 adds urgency while the 13 keeps it warm — strong pull toward minor resolution.' },
+      { type: '13#9',           suffix: '13#9',     formula: '1–3–5–b7–#9–13',     semitones: [0,4,7,10,15,21],    desc: 'Bluesy and full. The #9 "Hendrix" clash over a rich 13th chord — aggressive tension softened by the warm 13.' },
+      { type: '13#11',          suffix: '13#11',    formula: '1–3–5–b7–9–#11–13',  semitones: [0,4,7,10,14,18,21], desc: 'Lydian dominant fully extended. The #11 floats above a rich dominant 13th — modern, open, and luminous.' },
+      { type: '13b9 #11',       suffix: '13b9#11',  formula: '1–3–5–b7–b9–#11–13', semitones: [0,4,7,10,13,18,21], desc: 'Maximum color on a dominant. b9 tension and #11 float stacked together under the 13 — advanced bebop vocabulary.' },
+      { type: 'Major 13#11',    suffix: 'maj13#11', formula: '1–3–5–7–9–#11–13',   semitones: [0,4,7,11,14,18,21], desc: 'Lydian major fully extended. The #11 over a major 13th creates a shimmering, hyper-bright sound.' },
     ]
   },
   {
     group: 'Altered Dominants',
     chords: [
-      { type: '7alt',      suffix: '7alt',    formula: '1–3–b7–b9–#9–b13', semitones: [0,4,10,13,15,20] },
-      { type: '7b9 b13',   suffix: '7b9b13',  formula: '1–3–5–b7–b9–b13', semitones: [0,4,7,10,13,20]  },
-      { type: '7#9 b13',   suffix: '7#9b13',  formula: '1–3–5–b7–#9–b13', semitones: [0,4,7,10,15,20]  },
-      { type: '7b5 b9',    suffix: '7b5b9',   formula: '1–3–b5–b7–b9',    semitones: [0,4,6,10,13]     },
-      { type: '7b5 #9',    suffix: '7b5#9',   formula: '1–3–b5–b7–#9',    semitones: [0,4,6,10,15]     },
-      { type: '7#5 b9',    suffix: '7#5b9',   formula: '1–3–#5–b7–b9',    semitones: [0,4,8,10,13]     },
-      { type: '7#5 #9',    suffix: '7#5#9',   formula: '1–3–#5–b7–#9',    semitones: [0,4,8,10,15]     },
-      { type: '7b9 #9',    suffix: '7b9#9',   formula: '1–3–5–b7–b9–#9',  semitones: [0,4,7,10,13,15]  },
+      { type: '7alt',      suffix: '7alt',    formula: '1–3–b7–b9–#9–b13', semitones: [0,4,10,13,15,20], desc: 'The most altered dominant. Every extension is raised or lowered — from Altered scale. Maximum tension, usually resolves to Im.' },
+      { type: '7b9 b13',   suffix: '7b9b13',  formula: '1–3–5–b7–b9–b13', semitones: [0,4,7,10,13,20],  desc: 'Dark and minor-pointing. b9 and b13 together signal Phrygian dominant — strongly pulls to a minor tonic.' },
+      { type: '7#9 b13',   suffix: '7#9b13',  formula: '1–3–5–b7–#9–b13', semitones: [0,4,7,10,15,20],  desc: 'Gritty altered dominant. Pairs the "Hendrix" #9 clash with a flat 13 — bluesy, chromatic, and unstable.' },
+      { type: '7b5 b9',    suffix: '7b5b9',   formula: '1–3–b5–b7–b9',    semitones: [0,4,6,10,13],     desc: 'Sharp and dissonant. Two tritones plus a flat 9 — highly unstable, common in bebop passing dominants.' },
+      { type: '7b5 #9',    suffix: '7b5#9',   formula: '1–3–b5–b7–#9',    semitones: [0,4,6,10,15],     desc: 'Tense and edgy. b5 creates two tritones while #9 adds the "Hendrix" clash — dense, modern dominant color.' },
+      { type: '7#5 b9',    suffix: '7#5b9',   formula: '1–3–#5–b7–b9',    semitones: [0,4,8,10,13],     desc: 'Augmented with dark tension. The #5 pushes upward while b9 pulls down — competing forces create strong chromatic motion.' },
+      { type: '7#5 #9',    suffix: '7#5#9',   formula: '1–3–#5–b7–#9',    semitones: [0,4,8,10,15],     desc: 'Whole-tone adjacent. #5 and #9 together give a whole-tone flavor over a dominant — bright and disorienting.' },
+      { type: '7b9 #9',    suffix: '7b9#9',   formula: '1–3–5–b7–b9–#9',  semitones: [0,4,7,10,13,15],  desc: 'Both 9th alterations stacked. b9 and #9 simultaneously create a dense, clashing cluster — highly chromatic tension.' },
     ]
   },
   {
     group: 'Inversions',
     chords: [
-      { type: 'Maj 1st Inv',  suffix: '',       formula: '3–5–1',      semitones: [0,3,8],   bassOffset: 4  },
-      { type: 'Maj 2nd Inv',  suffix: '',       formula: '5–1–3',      semitones: [0,5,9],   bassOffset: 7  },
-      { type: 'Min 1st Inv',  suffix: 'm',      formula: 'b3–5–1',     semitones: [0,4,9],   bassOffset: 3  },
-      { type: 'Min 2nd Inv',  suffix: 'm',      formula: '5–1–b3',     semitones: [0,5,8],   bassOffset: 7  },
-      { type: 'Maj7 1st Inv', suffix: 'maj7',   formula: '3–5–7–1',    semitones: [0,3,7,8], bassOffset: 4  },
-      { type: 'Maj7 2nd Inv', suffix: 'maj7',   formula: '5–7–1–3',    semitones: [0,4,5,9], bassOffset: 7  },
-      { type: 'Maj7 3rd Inv', suffix: 'maj7',   formula: '7–1–3–5',    semitones: [0,1,5,8], bassOffset: 11 },
-      { type: 'Dom7 1st Inv', suffix: '7',      formula: '3–5–b7–1',   semitones: [0,3,6,8], bassOffset: 4  },
-      { type: 'Dom7 2nd Inv', suffix: '7',      formula: '5–b7–1–3',   semitones: [0,3,5,9], bassOffset: 7  },
-      { type: 'Dom7 3rd Inv', suffix: '7',      formula: 'b7–1–3–5',   semitones: [0,2,6,9], bassOffset: 10 },
-      { type: 'Min7 1st Inv', suffix: 'm7',     formula: 'b3–5–b7–1',  semitones: [0,4,7,9], bassOffset: 3  },
-      { type: 'Min7 2nd Inv', suffix: 'm7',     formula: '5–b7–1–b3',  semitones: [0,3,5,8], bassOffset: 7  },
-      { type: 'Min7 3rd Inv', suffix: 'm7',     formula: 'b7–1–b3–5',  semitones: [0,2,5,9], bassOffset: 10 },
+      { type: 'Maj 1st Inv',  suffix: '',       formula: '3–5–1',      semitones: [0,3,8],   bassOffset: 4,  desc: 'Major triad with the 3rd in the bass. Slightly lighter than root position — creates smooth bass line motion.' },
+      { type: 'Maj 2nd Inv',  suffix: '',       formula: '5–1–3',      semitones: [0,5,9],   bassOffset: 7,  desc: 'Major triad with the 5th in the bass. The most unstable major inversion — often used as a passing chord.' },
+      { type: 'Min 1st Inv',  suffix: 'm',      formula: 'b3–5–1',     semitones: [0,4,9],   bassOffset: 3,  desc: 'Minor triad with the flat 3rd in the bass. Slightly less dark than root position — smoother bass movement.' },
+      { type: 'Min 2nd Inv',  suffix: 'm',      formula: '5–1–b3',     semitones: [0,5,8],   bassOffset: 7,  desc: 'Minor triad with the 5th in the bass. Unstable and ambiguous — useful for voice-leading in minor progressions.' },
+      { type: 'Maj7 1st Inv', suffix: 'maj7',   formula: '3–5–7–1',    semitones: [0,3,7,8], bassOffset: 4,  desc: 'Maj7 with the 3rd in bass. The 3 bass under a maj7 chord creates a soft, open sound — melodic bass lines.' },
+      { type: 'Maj7 2nd Inv', suffix: 'maj7',   formula: '5–7–1–3',    semitones: [0,4,5,9], bassOffset: 7,  desc: 'Maj7 with the 5th in bass. The 5th bass note is neutral — passes smoothly between root-position chords.' },
+      { type: 'Maj7 3rd Inv', suffix: 'maj7',   formula: '7–1–3–5',    semitones: [0,1,5,8], bassOffset: 11, desc: 'Maj7 with the major 7th in bass. The leading-tone in bass creates strong upward pull back to the root.' },
+      { type: 'Dom7 1st Inv', suffix: '7',      formula: '3–5–b7–1',   semitones: [0,3,6,8], bassOffset: 4,  desc: 'Dom7 with 3rd in bass. Softens the dominant sound slightly — useful for smooth descending bass lines.' },
+      { type: 'Dom7 2nd Inv', suffix: '7',      formula: '5–b7–1–3',   semitones: [0,3,5,9], bassOffset: 7,  desc: 'Dom7 with 5th in bass. Neutral bass pitch reduces dominant tension — common in walking bass lines.' },
+      { type: 'Dom7 3rd Inv', suffix: '7',      formula: 'b7–1–3–5',   semitones: [0,2,6,9], bassOffset: 10, desc: 'Dom7 with b7 in bass. The b7 in bass creates half-step descent into the resolution — strong voice leading.' },
+      { type: 'Min7 1st Inv', suffix: 'm7',     formula: 'b3–5–b7–1',  semitones: [0,4,7,9], bassOffset: 3,  desc: 'Min7 with b3 in bass. A bit brighter than root position — the b3 bass creates a sense of gentle lift.' },
+      { type: 'Min7 2nd Inv', suffix: 'm7',     formula: '5–b7–1–b3',  semitones: [0,3,5,8], bassOffset: 7,  desc: 'Min7 with 5th in bass. Open and neutral — the 5th bass note is the least colorful inversion.' },
+      { type: 'Min7 3rd Inv', suffix: 'm7',     formula: 'b7–1–b3–5',  semitones: [0,2,5,9], bassOffset: 10, desc: 'Min7 with b7 in bass. The b7 in bass creates smooth stepwise motion — common in II–V bass line approaches.' },
     ]
   },
 ];
@@ -1473,11 +1498,7 @@ function renderSidebar() {
     renderSidebar();
   };
 
-  nav.appendChild(cpBtn);
-  nav.appendChild(chordsBtn);
-  sidebar.appendChild(nav);
-
-  // Modes section — always visible; clicking header or any mode instantly opens it
+  // Modes section — always visible at top; clicking header or any mode instantly opens it
   const modesHeader = document.createElement('button');
   modesHeader.className = 'sidebar-nav-btn' + (currentView === 'modes' ? ' active' : '');
   modesHeader.innerHTML = modesIcon() + 'Modes';
@@ -1532,6 +1553,22 @@ function renderSidebar() {
       sidebar.appendChild(btn);
     });
   });
+
+  // Bottom nav — Chord Progression, Chords, Scales
+  const scalesBtn = document.createElement('button');
+  scalesBtn.className = 'sidebar-nav-btn' + (currentView === 'scales' ? ' active' : '');
+  scalesBtn.innerHTML = modesIcon() + 'Scales';
+  scalesBtn.onclick = () => {
+    if (playbackStop) playbackStop();
+    currentView = 'scales';
+    renderScalesView();
+    renderSidebar();
+  };
+
+  nav.appendChild(cpBtn);
+  nav.appendChild(chordsBtn);
+  nav.appendChild(scalesBtn);
+  sidebar.appendChild(nav);
 
   // Mobile dropdown — rebuild options, keep selected in sync
   const mSel = document.getElementById('mobileModePick');
@@ -1906,6 +1943,7 @@ function renderChordTypesView() {
         <div class="cp-type">${chDef.type}</div>
         <div class="cp-formula">${chDef.formula}</div>
         <div class="cp-notes-txt">${notes.join(' · ')}</div>
+        ${chDef.desc ? `<div class="cp-desc">${chDef.desc}</div>` : ''}
       `;
       card.appendChild(cPlayBtn);
       grid.appendChild(card);
@@ -2116,6 +2154,77 @@ function renderMain() {
   main.appendChild(exSection);
 }
 
+function renderScalesView() {
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  const root = currentRoot;
+
+  const header = document.createElement('div');
+  header.className = 'mode-header';
+  header.innerHTML = `
+    <h2>Scales</h2>
+    <div class="parent">Root: <strong style="color:#c8a96e">${root}</strong> &nbsp;·&nbsp; All modes transposed</div>
+    <div class="sound-tag">Diatonic · Melodic Minor · All modes</div>
+  `;
+  main.appendChild(header);
+
+  MODES.forEach(group => {
+    const section = document.createElement('div');
+    section.className = 'cp-section';
+
+    const title = document.createElement('div');
+    title.className = 'cp-section-title';
+    title.textContent = group.group;
+    section.appendChild(title);
+
+    const grid = document.createElement('div');
+    grid.className = 'scales-grid';
+
+    group.modes.forEach(mode => {
+      const scaleNotes = mode.intervals.map(iv => CHROMATIC[(CHROMATIC.indexOf(root) + iv) % 12]);
+      const spelledScale = getSpelledScale(root, mode.intervals, mode.intervalNames);
+
+      const card = document.createElement('div');
+      card.className = 'scale-card';
+      card.title = 'View mode detail';
+
+      card.innerHTML = `
+        <div class="scale-card-header">
+          <span class="scale-name">${root} ${mode.name}</span>
+          <span class="scale-degree">${mode.degree}</span>
+        </div>
+        <div class="scale-sound">${mode.sound}</div>
+        <div class="scale-notes">${spelledScale.join(' · ')}</div>
+        <div class="scale-parent">${mode.parent}</div>
+      `;
+
+      const playBtn = document.createElement('button');
+      playBtn.className = 'chord-play-btn';
+      playBtn.innerHTML = playIcon();
+      playBtn.title = 'Play scale';
+      playBtn.onclick = e => {
+        e.stopPropagation();
+        playBtn.disabled = true;
+        playScale(scaleNotes, playBtn, null);
+      };
+      card.appendChild(playBtn);
+
+      card.addEventListener('click', () => {
+        if (playbackStop) playbackStop();
+        currentView = 'modes';
+        currentMode = mode;
+        renderMain();
+        renderSidebar();
+      });
+
+      grid.appendChild(card);
+    });
+
+    section.appendChild(grid);
+    main.appendChild(section);
+  });
+}
+
 document.getElementById('rootSelect').addEventListener('change', e => {
   const val = e.target.value;
   if (val.includes('/')) {
@@ -2125,6 +2234,7 @@ document.getElementById('rootSelect').addEventListener('change', e => {
   }
   if (currentView === 'chords') renderChordProgressionView();
   else if (currentView === 'chordtypes') renderChordTypesView();
+  else if (currentView === 'scales') renderScalesView();
   else renderMain();
 });
 
