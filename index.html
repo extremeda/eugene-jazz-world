@@ -166,7 +166,27 @@
       text-transform: uppercase;
       color: #777;
       margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      user-select: none;
+      background: none;
+      border: none;
+      padding: 0;
+      font-family: inherit;
+      width: 100%;
+      text-align: left;
     }
+    .section-title:hover { color: #aaa; }
+    .section-title .chevron {
+      margin-left: auto;
+      transition: transform 0.2s;
+      opacity: 0.5;
+    }
+    .section.collapsed .chevron { transform: rotate(-90deg); }
+    .section-body { overflow: hidden; }
+    .section.collapsed .section-body { display: none; }
 
     .notes-row {
       display: flex;
@@ -1893,6 +1913,23 @@ function renderPiano(scaleNotes, root, charIndices) {
   return piano;
 }
 
+function makeSection(titleText, open = true) {
+  const section = document.createElement('div');
+  section.className = 'section' + (open ? '' : ' collapsed');
+
+  const titleBtn = document.createElement('button');
+  titleBtn.className = 'section-title';
+  titleBtn.innerHTML = `${titleText}<svg class="chevron" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="2,3 5,7 8,3"/></svg>`;
+  titleBtn.onclick = () => section.classList.toggle('collapsed');
+
+  const body = document.createElement('div');
+  body.className = 'section-body';
+
+  section.appendChild(titleBtn);
+  section.appendChild(body);
+  return { section, body };
+}
+
 function renderMain() {
   const m = currentMode;
   const root = currentRoot;
@@ -1920,9 +1957,7 @@ function renderMain() {
   main.appendChild(header);
 
   // Notes
-  const notesSection = document.createElement('div');
-  notesSection.className = 'section';
-  notesSection.innerHTML = '<div class="section-title">Scale Degrees</div>';
+  const { section: notesSection, body: notesBody } = makeSection('Scale Degrees');
   const notesRow = document.createElement('div');
   notesRow.className = 'notes-row';
   scaleNotes.forEach((note, idx) => {
@@ -1933,20 +1968,18 @@ function renderMain() {
     cell.innerHTML = `<div class="note-name">${spelledScale[idx]}</div><div class="interval">${m.intervalNames[idx]}</div>`;
     notesRow.appendChild(cell);
   });
-  notesSection.appendChild(notesRow);
+  notesBody.appendChild(notesRow);
   const legend = document.createElement('div');
   legend.className = 'interval-legend';
   const charSpelled = m.characteristic.map(i => spelledScale[i]);
   legend.innerHTML = `Root: <b style="color:#c8a96e">${spelledScale[0]}</b> &nbsp;·&nbsp; Characteristic tone: <span>${charSpelled.join(', ')}</span>`;
-  notesSection.appendChild(legend);
+  notesBody.appendChild(legend);
   main.appendChild(notesSection);
 
   // Piano
-  const pianoSection = document.createElement('div');
-  pianoSection.className = 'section';
-  pianoSection.innerHTML = '<div class="section-title">Keyboard</div>';
+  const { section: pianoSection, body: pianoBody } = makeSection('Keyboard');
   const pianoEl = renderPiano(scaleNotes, root, m.characteristic);
-  pianoSection.appendChild(pianoEl);
+  pianoBody.appendChild(pianoEl);
   main.appendChild(pianoSection);
 
   // Wire play button now that pianoEl exists
@@ -1954,16 +1987,13 @@ function renderMain() {
 
   // Chords
   const rootSemitone = CHROMATIC.indexOf(root);
-  const chordSection = document.createElement('div');
-  chordSection.className = 'section';
-  chordSection.innerHTML = '<div class="section-title">Common Chords</div>';
+  const { section: chordSection, body: chordBody } = makeSection('Common Chords');
   const chordsGrid = document.createElement('div');
   chordsGrid.className = 'chords-grid';
 
   m.chords.forEach(ch => {
     const card = document.createElement('div');
     card.className = 'chord-card';
-    // Transpose chord name root
     const chordRoot = ch.name.match(/^[A-G]#?/)[0];
     const diff = (rootSemitone - CHROMATIC.indexOf('C') + 12) % 12;
     const newChordRoot = CHROMATIC[(CHROMATIC.indexOf(chordRoot) + diff) % 12];
@@ -1993,29 +2023,27 @@ function renderMain() {
     card.appendChild(cPlayBtn);
     chordsGrid.appendChild(card);
   });
-  chordSection.appendChild(chordsGrid);
+  chordBody.appendChild(chordsGrid);
   main.appendChild(chordSection);
 
   // Description
-  const descSection = document.createElement('div');
-  descSection.className = 'section';
-  descSection.innerHTML = `<div class="section-title">Character</div><p class="description">${m.description}</p>`;
+  const { section: descSection, body: descBody } = makeSection('Character');
+  const descP = document.createElement('p');
+  descP.className = 'description';
+  descP.textContent = m.description;
+  descBody.appendChild(descP);
   main.appendChild(descSection);
 
   // Usage
-  const usageSection = document.createElement('div');
-  usageSection.className = 'section';
-  usageSection.innerHTML = '<div class="section-title">Use Over</div>';
+  const { section: usageSection, body: usageBody } = makeSection('Use Over');
   const ul = document.createElement('ul');
   ul.className = 'usage-list';
   m.usage.forEach(u => { const li = document.createElement('li'); li.textContent = u; ul.appendChild(li); });
-  usageSection.appendChild(ul);
+  usageBody.appendChild(ul);
   main.appendChild(usageSection);
 
   // Examples
-  const exSection = document.createElement('div');
-  exSection.className = 'section';
-  exSection.innerHTML = '<div class="section-title">Heard In</div>';
+  const { section: exSection, body: exBody } = makeSection('Heard In');
   const exRow = document.createElement('div');
   exRow.className = 'examples-row';
   m.examples.forEach(e => {
@@ -2024,7 +2052,7 @@ function renderMain() {
     tag.textContent = e;
     exRow.appendChild(tag);
   });
-  exSection.appendChild(exRow);
+  exBody.appendChild(exRow);
   main.appendChild(exSection);
 }
 
