@@ -638,6 +638,16 @@
       padding-bottom: 0.4rem;
       border-bottom: 1px solid #222;
     }
+    .scale-detail-card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 4px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 0.7rem;
+      position: relative;
+    }
+    .scale-detail-card:last-child { margin-bottom: 0; }
+
     .cp-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -1111,6 +1121,162 @@ let currentRoot = 'C';
 let currentView = 'modes'; // 'modes' | 'chords'
 let modesListOpen = true;
 
+const SCALES_DATA = [
+  {
+    group: 'Minor Scales',
+    scales: [
+      {
+        name: 'Natural Minor',
+        intervals: [0,2,3,5,7,8,10],
+        intervalNames: ['1','2','b3','4','5','b6','b7'],
+        sound: 'Dark, sad, familiar',
+        description: 'The most common minor scale in Western music — also called Aeolian mode. Its b3, b6, and b7 give it a melancholic, introspective character. The foundation of minor key harmony in classical, pop, and folk music.',
+        examples: ['Autumn Leaves (minor sections)', 'Summertime', 'Minor key pop & rock'],
+      },
+      {
+        name: 'Harmonic Minor',
+        intervals: [0,2,3,5,7,8,11],
+        intervalNames: ['1','2','b3','4','5','b6','7'],
+        sound: 'Exotic, tense, classical',
+        description: 'Natural minor with a raised 7th — creating a leading tone that pulls strongly to the root. The augmented 2nd between b6 and 7 gives it a distinctly exotic, Middle-Eastern flavor. Used heavily in classical and flamenco harmony.',
+        examples: ['Classical minor cadences', 'Flamenco guitar', 'Violin concertos in minor'],
+      },
+      {
+        name: 'Melodic Minor',
+        intervals: [0,2,3,5,7,9,11],
+        intervalNames: ['1','2','b3','4','5','6','7'],
+        sound: 'Smooth, bittersweet, modern jazz',
+        description: 'Minor with raised 6th and 7th (ascending form). Eliminates the awkward augmented 2nd of harmonic minor for smoother melodic lines. The parent scale of all melodic minor modes — Lydian Dominant, Altered Scale, and more. Essential in modern jazz.',
+        examples: ['Miles Davis modal jazz', 'Bill Evans chord voicings', 'Modern jazz improvisation'],
+      },
+      {
+        name: 'Hungarian Minor',
+        intervals: [0,2,3,6,7,8,11],
+        intervalNames: ['1','2','b3','#4','5','b6','7'],
+        sound: 'Dramatic, Eastern European, exotic',
+        description: 'Harmonic minor with a raised 4th (#4). Contains two augmented 2nds — between b3 and #4, and between b6 and 7 — giving it a uniquely dramatic, Eastern European sound. Used in Hungarian folk music and Romantic-era classical pieces.',
+        examples: ['Liszt Hungarian Rhapsodies', 'Eastern European folk music', 'Film scores for dramatic tension'],
+      },
+      {
+        name: 'Double Harmonic',
+        intervals: [0,1,4,5,7,8,11],
+        intervalNames: ['1','b2','3','4','5','b6','7'],
+        sound: 'Byzantine, mysterious, intense',
+        description: 'Also called Byzantine or Double Harmonic Major. Two augmented 2nds — between b2 and 3, and between b6 and 7 — create an intensely exotic sound. Used in Middle Eastern, Greek, and Indian classical music. Extremely distinctive and hard to use subtly.',
+        examples: ['Byzantine chant', 'Middle Eastern classical music', 'Exotic film and game scores'],
+      },
+    ]
+  },
+  {
+    group: 'Pentatonic',
+    scales: [
+      {
+        name: 'Minor Pentatonic',
+        intervals: [0,3,5,7,10],
+        intervalNames: ['1','b3','4','5','b7'],
+        sound: 'Soulful, universal, bluesy',
+        description: 'Five notes — the backbone of blues, rock, and jazz. Works over both minor and dominant 7th chords. The simplest and most universally applicable scale in popular music. Every improviser starts here.',
+        examples: ['Blues solos universally', 'Miles Davis Kind of Blue licks', 'Wes Montgomery lines'],
+      },
+      {
+        name: 'Major Pentatonic',
+        intervals: [0,2,4,7,9],
+        intervalNames: ['1','2','3','5','6'],
+        sound: 'Open, bright, joyful',
+        description: 'Bright and open — no half steps, no dissonance. Works over major and dominant chords. In jazz, musicians superimpose one root\'s pentatonic over a different chord to create color and tension — a hallmark of McCoy Tyner and modern players.',
+        examples: ['McCoy Tyner pentatonic stacking', 'Country guitar', 'Woody Shaw trumpet lines'],
+      },
+    ]
+  },
+  {
+    group: 'Symmetric Scales',
+    scales: [
+      {
+        name: 'Chromatic',
+        intervals: [0,1,2,3,4,5,6,7,8,9,10,11],
+        intervalNames: ['1','b2','2','b3','3','4','#4','5','b6','6','b7','7'],
+        sound: 'All notes — no tonal center',
+        description: 'All 12 semitones. Has no inherent tonal center or hierarchy — all notes are equal. Used as a tool for chromatic passing tones between scale notes rather than as a standalone scale. A foundation for understanding half-step voice leading.',
+        examples: ['Chromatic passing tones', 'Bebop chromatic runs', 'Atonal music'],
+      },
+      {
+        name: 'Whole Tone',
+        intervals: [0,2,4,6,8,10],
+        intervalNames: ['1','2','3','#4','#5','b7'],
+        sound: 'Floating, ambiguous, Debussy',
+        description: 'Six equal whole steps — completely symmetrical. Has no half steps, so it feels directionless and floating. Only 2 transpositions exist. Used over augmented dominant chords (7#5). Its dreamlike quality influenced Debussy and impressionist composers.',
+        examples: ['Debussy impressionist passages', 'Wayne Shorter augmented chords', 'Bill Evans floating textures'],
+      },
+      {
+        name: 'Half-Whole Diminished',
+        intervals: [0,1,3,4,6,7,9,10],
+        intervalNames: ['1','b2','b3','3','b5','5','6','b7'],
+        sound: 'Tense, symmetrical, dominant',
+        description: 'Starts with a half step — used over dominant 7th chords with b9. Contains all chord tones plus b9, #9, and #11 simultaneously. 3 transpositions exist. A bebop staple for dominant chord solos.',
+        examples: ['Bebop dominant lines', 'V7b9 chord solos', 'Joe Pass dominant phrases'],
+      },
+      {
+        name: 'Whole-Half Diminished',
+        intervals: [0,2,3,5,6,8,9,11],
+        intervalNames: ['1','2','b3','4','b5','#5','6','7'],
+        sound: 'Eerie, symmetrical, dim7',
+        description: 'Starts with a whole step — used over diminished 7th chords. Its symmetry means a scale built on C works equally over Eb, Gb, and A diminished chords. Used as a connecting or passing device between diatonic chords.',
+        examples: ['Dim7 chord solos', 'Rhythm changes bridge', 'Bebop passing chords'],
+      },
+    ]
+  },
+  {
+    group: 'Jazz Scales',
+    scales: [
+      {
+        name: 'Altered Scale',
+        intervals: [0,1,3,4,6,8,10],
+        intervalNames: ['1','b2','#2','3','#4','#5','b7'],
+        sound: 'Maximum tension — all altered notes',
+        description: 'The 7th mode of Melodic Minor — contains b9, #9, b5, AND b13 simultaneously. Used over altered dominant chords (V7alt) for maximum tension before resolving to Im. Called "super-Locrian." The ultimate dominant tension scale in jazz.',
+        examples: ['Countdown — Coltrane', 'Post-bop V7alt solos', 'Giant Steps substitutions'],
+      },
+      {
+        name: 'Bebop Dominant',
+        intervals: [0,2,4,5,7,9,10,11],
+        intervalNames: ['1','2','3','4','5','6','b7','7'],
+        sound: 'Swinging, chromatic, bebop',
+        description: 'Mixolydian with an added natural 7th — the passing tone between b7 and the octave. The extra note keeps chord tones landing on strong beats when playing 8th notes. Invented by bebop musicians to make fast lines sound "right" harmonically.',
+        examples: ['Charlie Parker dominant lines', 'Bebop heads over V7', 'Hard bop dominant solos'],
+      },
+    ]
+  },
+  {
+    group: 'World Scales',
+    scales: [
+      {
+        name: 'Arabic Scale',
+        intervals: [0,1,4,5,7,8,11],
+        intervalNames: ['1','b2','3','4','5','b6','7'],
+        sound: 'Middle Eastern, intense, ancient',
+        description: 'Also called the Byzantine scale. Two augmented 2nds give it a stark, ornate character rooted in Arabic maqam and Byzantine music traditions. The b2 and major 3rd create an immediate exotic tension. Found across Middle Eastern, Turkish, and Greek music.',
+        examples: ['Arabic maqam improvisation', 'Oud and saz music', 'Middle Eastern film scores'],
+      },
+      {
+        name: 'Japanese In Scale',
+        intervals: [0,1,5,7,8],
+        intervalNames: ['1','b2','4','5','b6'],
+        sound: 'Ancient, sparse, meditative',
+        description: 'A pentatonic scale used in traditional Japanese music — specifically the Miyako-bushi mode. Only 5 notes with a striking half-step at the bottom. Its sparse quality evokes koto and shakuhachi music. Used in film scores for Japanese or East Asian settings.',
+        examples: ['Traditional koto music', 'Shakuhachi flute', 'Japanese film and game scores'],
+      },
+      {
+        name: 'Indian Raga Bhairav',
+        intervals: [0,1,4,5,7,8,11],
+        intervalNames: ['1','b2','3','4','5','b6','7'],
+        sound: 'Devotional, dawn, serene intensity',
+        description: 'One of the most important ragas in Hindustani classical music — traditionally performed at dawn. Uses komal (flat) Re and Dha (b2 and b6) with a natural Ga and Ni (3 and 7), creating two augmented 2nds. Indian ragas are a vast system: each has specific ornaments (gamakas), time of day, and emotional character (rasa).',
+        examples: ['Ravi Shankar sitar performances', 'Hindustani classical dawn ragas', 'John McLaughlin Shakti fusion'],
+      },
+    ]
+  },
+];
+
 const CHORD_TYPES = [
   {
     group: 'Triads',
@@ -1474,8 +1640,19 @@ function renderSidebar() {
   });
   sidebar.appendChild(modesList);
 
+  const scalesNavBtn = document.createElement('button');
+  scalesNavBtn.className = 'sidebar-nav-btn' + (currentView === 'scales' ? ' active' : '');
+  scalesNavBtn.innerHTML = modesIcon() + 'Scales';
+  scalesNavBtn.onclick = () => {
+    if (playbackStop) playbackStop();
+    currentView = 'scales';
+    renderScalesView();
+    renderSidebar();
+  };
+
   nav.appendChild(cpBtn);
   nav.appendChild(chordsBtn);
+  nav.appendChild(scalesNavBtn);
   sidebar.appendChild(nav);
 
   // Mobile dropdown — rebuild options, keep selected in sync
@@ -2099,6 +2276,95 @@ function renderMain() {
   main.appendChild(exSection);
 }
 
+function renderScalesView() {
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  const root = currentRoot;
+  const ri = CHROMATIC.indexOf(root);
+
+  const header = document.createElement('div');
+  header.className = 'mode-header';
+  header.innerHTML = `
+    <h2>Scales</h2>
+    <div class="parent">Root: <strong style="color:#c8a96e">${root}</strong> &nbsp;·&nbsp; All scales transposed</div>
+    <div class="sound-tag">Minor · Pentatonic · Symmetric · Jazz · World</div>
+  `;
+  main.appendChild(header);
+
+  SCALES_DATA.forEach(group => {
+    const section = document.createElement('div');
+    section.className = 'cp-section';
+
+    const title = document.createElement('div');
+    title.className = 'cp-section-title';
+    title.textContent = group.group;
+    section.appendChild(title);
+
+    group.scales.forEach(scale => {
+      const notes = scale.intervals.map(iv => CHROMATIC[(ri + iv) % 12]);
+      const spelledNotes = getSpelledScale(root, scale.intervals, scale.intervalNames);
+
+      const card = document.createElement('div');
+      card.className = 'scale-detail-card';
+
+      const topRow = document.createElement('div');
+      topRow.style.cssText = 'display:flex;align-items:baseline;justify-content:space-between;margin-bottom:0.25rem;';
+
+      const nameEl = document.createElement('div');
+      nameEl.style.cssText = 'font-size:1rem;color:#e8e0d0;font-weight:600;';
+      nameEl.textContent = `${root} ${scale.name}`;
+
+      const playBtn = document.createElement('button');
+      playBtn.className = 'chord-play-btn';
+      playBtn.innerHTML = playIcon();
+      playBtn.title = 'Play scale';
+      playBtn.onclick = () => {
+        const ctx = getAudioCtx();
+        const now = ctx.currentTime;
+        notes.forEach((n, i) => playNote(ctx, NOTE_FREQ[n], now + i * 0.22, 0.5));
+      };
+
+      topRow.appendChild(nameEl);
+      topRow.appendChild(playBtn);
+      card.appendChild(topRow);
+
+      const soundEl = document.createElement('div');
+      soundEl.style.cssText = 'font-size:0.68rem;color:#8ab87a;font-style:italic;margin-bottom:0.3rem;';
+      soundEl.textContent = scale.sound;
+      card.appendChild(soundEl);
+
+      const notesEl = document.createElement('div');
+      notesEl.style.cssText = 'font-size:0.7rem;color:#c8a96e;margin-bottom:0.1rem;letter-spacing:0.04em;';
+      notesEl.textContent = spelledNotes.join(' · ');
+      card.appendChild(notesEl);
+
+      const formulaEl = document.createElement('div');
+      formulaEl.style.cssText = 'font-size:0.62rem;color:#555;margin-bottom:0.5rem;font-style:italic;';
+      formulaEl.textContent = scale.intervalNames.join(' – ');
+      card.appendChild(formulaEl);
+
+      const descEl = document.createElement('div');
+      descEl.style.cssText = 'font-size:0.72rem;color:#999;line-height:1.6;margin-bottom:0.4rem;';
+      descEl.textContent = scale.description;
+      card.appendChild(descEl);
+
+      const exRow = document.createElement('div');
+      exRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:0.3rem;';
+      scale.examples.forEach(ex => {
+        const tag = document.createElement('div');
+        tag.className = 'example-tag';
+        tag.textContent = ex;
+        exRow.appendChild(tag);
+      });
+      card.appendChild(exRow);
+
+      section.appendChild(card);
+    });
+
+    main.appendChild(section);
+  });
+}
+
 document.getElementById('rootSelect').addEventListener('change', e => {
   const val = e.target.value;
   if (val.includes('/')) {
@@ -2108,6 +2374,7 @@ document.getElementById('rootSelect').addEventListener('change', e => {
   }
   if (currentView === 'chords') renderChordProgressionView();
   else if (currentView === 'chordtypes') renderChordTypesView();
+  else if (currentView === 'scales') renderScalesView();
   else renderMain();
 });
 
