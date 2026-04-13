@@ -1511,7 +1511,6 @@ function renderSidebar() {
     });
   });
 
-  // Bottom nav — Chord Progression, Chords, Scales
   const scalesBtn = document.createElement('button');
   scalesBtn.className = 'sidebar-nav-btn' + (currentView === 'scales' ? ' active' : '');
   scalesBtn.innerHTML = modesIcon() + 'Scales';
@@ -2111,6 +2110,8 @@ function renderMain() {
   main.appendChild(exSection);
 }
 
+const SCALES_EXCLUDE = new Set(['Modes of the Major Scale', 'Melodic Minor Modes', 'Blues & Pentatonic']);
+
 function renderScalesView() {
   const main = document.getElementById('main');
   main.innerHTML = '';
@@ -2120,12 +2121,12 @@ function renderScalesView() {
   header.className = 'mode-header';
   header.innerHTML = `
     <h2>Scales</h2>
-    <div class="parent">Root: <strong style="color:#c8a96e">${root}</strong> &nbsp;·&nbsp; All modes transposed</div>
-    <div class="sound-tag">Diatonic · Melodic Minor · All modes</div>
+    <div class="parent">Root: <strong style="color:#c8a96e">${root}</strong> &nbsp;·&nbsp; All scales transposed</div>
+    <div class="sound-tag">Symmetric · Exotic · Non-diatonic</div>
   `;
   main.appendChild(header);
 
-  MODES.forEach(group => {
+  MODES.filter(g => !SCALES_EXCLUDE.has(g.group)).forEach(group => {
     const section = document.createElement('div');
     section.className = 'cp-section';
 
@@ -2143,7 +2144,7 @@ function renderScalesView() {
 
       const card = document.createElement('div');
       card.className = 'scale-card';
-      card.title = 'View mode detail';
+      card.title = 'View detail';
 
       card.innerHTML = `
         <div class="scale-card-header">
@@ -2161,7 +2162,6 @@ function renderScalesView() {
       playBtn.title = 'Play scale';
       playBtn.onclick = e => {
         e.stopPropagation();
-        playBtn.disabled = true;
         playScale(scaleNotes, playBtn, null);
       };
       card.appendChild(playBtn);
