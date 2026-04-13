@@ -2366,16 +2366,7 @@ function renderScalesView() {
       playBtn.className = 'play-btn';
       playBtn.style.cssText = 'margin-top:0;flex-shrink:0;';
       playBtn.innerHTML = playIcon() + 'Play scale';
-      playBtn.onclick = () => {
-        const ctx = getAudioCtx();
-        const now = ctx.currentTime;
-        const step = 0.22;
-        const ascDesc = [...notes, notes[0], ...[...notes].reverse()];
-        ascDesc.forEach((n, i) => {
-          const freq = NOTE_FREQ[n] * (i >= notes.length ? 2 : 1);
-          playNote(ctx, freq, now + i * step, 0.45);
-        });
-      };
+      playBtn.onclick = () => playScale(notes, playBtn, null);
       pianoTopRow.appendChild(pianoEl);
       pianoTopRow.appendChild(playBtn);
       pianoWrap.appendChild(pianoTopRow);
