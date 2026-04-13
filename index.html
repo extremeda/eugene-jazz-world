@@ -113,6 +113,14 @@
 
     .mode-btn.active .degree { color: #8a6a3a; }
 
+    .mode-subtitle {
+      font-size: 0.62rem;
+      color: #666;
+      font-style: italic;
+    }
+
+    .mode-btn.active .mode-subtitle { color: #7a5a30; }
+
     .main {
       flex: 1;
       overflow-y: auto;
@@ -205,13 +213,16 @@
       gap: 0;
       margin-top: 0.5rem;
       overflow-x: auto;
-      padding-bottom: 6px;
+      overflow-y: hidden;
+      height: 108px; /* 100px keys + 8px breathing room */
+      padding-bottom: 8px;
     }
 
     .octave {
       position: relative;
       display: flex;
       flex-shrink: 0;
+      height: 100px;
     }
 
     .key {
@@ -224,8 +235,8 @@
     .key.white {
       width: 28px;
       height: 100px;
-      background: #1e1e1e;
-      border: 1px solid #333;
+      background: #f0f0f0;
+      border: 1px solid #aaa;
       margin-right: -1px; /* overlap borders */
       z-index: 0;
     }
@@ -235,17 +246,17 @@
       top: 0;
       width: 17px;
       height: 62px;
-      background: #111;
-      border: 1px solid #444;
+      background: #222;
+      border: 1px solid #000;
       z-index: 1;
     }
 
-    .key.in-scale.white { background: #2a251a; border-color: #5a4a28; }
-    .key.in-scale.black { background: #3a3020; border-color: #6a5a30; }
-    .key.root-key.white { background: #4a3a18; border-color: #c8a96e; }
-    .key.root-key.black { background: #5a4a20; border-color: #c8a96e; }
-    .key.char-key.white { background: #1a2a30; border-color: #7eb8c9; }
-    .key.char-key.black { background: #1a2530; border-color: #7eb8c9; }
+    .key.in-scale.white { background: #e8d89a; border-color: #b89840; }
+    .key.in-scale.black { background: #5a4a20; border-color: #8a6a30; }
+    .key.root-key.white { background: #c8a96e; border-color: #c8a96e; }
+    .key.root-key.black { background: #7a5a20; border-color: #c8a96e; }
+    .key.char-key.white { background: #b8d8e8; border-color: #5a98b8; }
+    .key.char-key.black { background: #1a3a50; border-color: #5a98b8; }
 
     .key-label {
       position: absolute;
@@ -257,11 +268,11 @@
       white-space: nowrap;
     }
 
-    .key.white .key-label { color: #888; }
-    .key.black .key-label { color: #888; }
-    .key.in-scale.white .key-label { color: #ccc; }
-    .key.root-key .key-label { color: #c8a96e !important; }
-    .key.char-key .key-label { color: #7eb8c9 !important; }
+    .key.white .key-label { color: #666; }
+    .key.black .key-label { color: #aaa; }
+    .key.in-scale.white .key-label { color: #444; }
+    .key.root-key .key-label { color: #3a2800 !important; }
+    .key.char-key .key-label { color: #1a4a6a !important; }
 
     .chords-grid {
       display: grid;
@@ -424,6 +435,10 @@
 
       .play-btn { font-size: 0.75rem; padding: 0.35rem 0.85rem; }
 
+      /* Piano size on mobile */
+      .piano { height: 83px; } /* 75px keys + 8px */
+      .octave { height: 75px; } /* ~100 * (21/28) */
+
       /* Metronome: smaller on mobile */
       .metro-circle { width: 54px; height: 54px; }
       .metro-dot { width: 5px; height: 5px; top: 4px; }
@@ -435,6 +450,246 @@
     @media (max-width: 400px) {
       .root-selector { gap: 0.4rem; }
       header h1 { font-size: 1.1rem; }
+    }
+
+    /* ── Sidebar nav tabs ── */
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      border-bottom: 1px solid #1e1e1e;
+      padding: 0.4rem 0;
+    }
+    .sidebar-nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      width: 100%;
+      padding: 0.75rem 1.2rem;
+      background: none;
+      border: none;
+      border-left: 3px solid transparent;
+      color: #777;
+      font-size: 0.68rem;
+      font-family: inherit;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+    }
+    .sidebar-nav-btn:hover { color: #ccc; background: #141414; }
+    .sidebar-nav-btn.active { color: #c8a96e; border-left-color: #c8a96e; background: #161410; }
+    .sidebar-nav-btn svg { flex-shrink: 0; opacity: 0.75; }
+    .sidebar-nav-btn.active svg { opacity: 1; }
+
+    /* ── Quick-jump pills ── */
+    .quick-jump {
+      display: flex;
+      gap: 0.4rem;
+      padding: 0.5rem 1.2rem 0.6rem;
+      flex-wrap: wrap;
+    }
+    .quick-jump-btn {
+      padding: 0.18rem 0.6rem;
+      background: #1a1508;
+      border: 1px solid #3a3020;
+      border-radius: 12px;
+      color: #c8a96e;
+      font-size: 0.68rem;
+      font-family: inherit;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .quick-jump-btn:hover { background: #252010; border-color: #c8a96e; }
+
+    /* ── Active chord pill during progression playback ── */
+    .prog-pill-active {
+      background: #3a3020 !important;
+      border-color: #c8a96e !important;
+      color: #c8a96e !important;
+    }
+
+    /* ── Progression card flow ── */
+    .prog-flow {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 1.2rem;
+    }
+
+    .prog-arrow {
+      font-size: 1.5rem;
+      color: #3a3a3a;
+      padding-top: 56px;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .prog-card {
+      background: #141414;
+      border: 1px solid #252525;
+      border-radius: 10px;
+      padding: 16px 14px;
+      width: 164px;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: border-color 0.18s, background 0.18s, transform 0.18s;
+      text-align: center;
+    }
+
+    .prog-card:hover { border-color: #c8a96e; transform: translateY(-2px); }
+    .prog-card.pc-active { border-color: #c8a96e; background: #1a1508; }
+
+    .prog-card .pc-numeral {
+      font-size: 0.68rem;
+      color: #555;
+      letter-spacing: 0.12em;
+      margin-bottom: 5px;
+    }
+
+    .prog-card .pc-name {
+      font-size: 1.55rem;
+      color: #e8e0d0;
+      margin-bottom: 3px;
+      line-height: 1.1;
+      font-weight: normal;
+    }
+
+    .prog-card.pc-active .pc-name { color: #c8a96e; }
+
+    .prog-card .pc-quality {
+      font-size: 0.68rem;
+      color: #666;
+      font-style: italic;
+      margin-bottom: 11px;
+    }
+
+    .prog-card .pc-notes {
+      display: flex;
+      justify-content: center;
+      gap: 3px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .pc-note {
+      background: #1e1e1e;
+      border: 1px solid #2e2e2e;
+      border-radius: 3px;
+      padding: 2px 5px;
+      font-size: 0.72rem;
+      color: #aaa;
+    }
+
+    .pc-note.is-root { border-color: #c8a96e; color: #c8a96e; }
+
+    .prog-card .pc-role {
+      display: inline-block;
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 3px;
+    }
+
+    .pc-role.role-rest    { background: #0d1f0d; border: 1px solid #254025; color: #6db86d; }
+    .pc-role.role-tension { background: #1f0d0d; border: 1px solid #401e1e; color: #c07070; }
+    .pc-role.role-buildup { background: #1a1505; border: 1px solid #3a3008; color: #b8a050; }
+    .pc-role.role-neutral { background: #111820; border: 1px solid #1e3050; color: #6090c0; }
+
+    /* piano inside prog detail */
+    .prog-detail-piano {
+      margin: 0.8rem 0 1rem;
+    }
+    .prog-detail-piano-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Piano key press animation */
+    @keyframes white-press {
+      0%   { background: #f0f0f0; }
+      12%  { background: #e8c060; box-shadow: 0 0 8px #c8a96e88; }
+      100% { background: #c8a96e; box-shadow: 0 0 4px #c8a96e44; }
+    }
+    @keyframes black-press {
+      0%   { background: #222; }
+      12%  { background: #c09030; box-shadow: 0 0 6px #c8a96e88; }
+      100% { background: #b08820; box-shadow: 0 0 3px #c8a96e44; }
+    }
+    .cp-piano-white     { position:absolute; border-radius:0 0 3px 3px; border:1px solid #aaa; background:#f0f0f0; }
+    .cp-piano-white.lit { animation: white-press 0.22s ease-out forwards; }
+    .cp-piano-black     { position:absolute; border-radius:0 0 2px 2px; border:1px solid #000; background:#222; z-index:1; }
+    .cp-piano-black.lit { animation: black-press 0.22s ease-out forwards; }
+
+    /* ── Chord progression view ── */
+    .cp-section { margin-bottom: 2.2rem; }
+    .cp-section-title {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #c8a96e;
+      margin-bottom: 0.8rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid #222;
+    }
+    .cp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
+      gap: 0.5rem;
+    }
+    .cp-card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 4px;
+      padding: 0.6rem 0.85rem;
+      position: relative;
+    }
+    .cp-card .cp-name { font-size: 1rem; color: #e8e0d0; }
+    .cp-card .cp-type { font-size: 0.68rem; color: #888; margin-top: 0.1rem; }
+    .cp-card .cp-formula { font-size: 0.63rem; color: #666; margin-top: 0.1rem; font-style: italic; }
+    .cp-card .cp-notes-txt { font-size: 0.63rem; color: #777; margin-top: 0.1rem; }
+    .prog-row {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 4px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.45rem;
+    }
+    .prog-row .prog-name {
+      font-size: 0.8rem;
+      color: #c8a96e;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.35rem;
+    }
+    .prog-row .prog-chords-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-bottom: 0.3rem;
+    }
+    .prog-chord-pill {
+      padding: 0.18rem 0.55rem;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      color: #e8e0d0;
+    }
+    .prog-chord-pill .pill-deg {
+      font-size: 0.58rem;
+      color: #666;
+      margin-left: 0.2rem;
+    }
+    .prog-row .prog-desc {
+      font-size: 0.7rem;
+      color: #666;
+      font-style: italic;
     }
 
     /* ── Metronome ── */
@@ -593,10 +848,10 @@ const MODES = [
     group: 'Modes of the Major Scale',
     modes: [
       {
-        name: 'Ionian', degree: 'I', parent: 'Major Scale',
+        name: 'Ionian', subtitle: 'major scale', degree: 'I', parent: 'Major Scale',
         intervals: [0,2,4,5,7,9,11],
         intervalNames: ['1','2','3','4','5','6','7'],
-        characteristic: [4], // major 3rd and major 7th
+        characteristic: [4], charDesc: 'Major 3rd — gives Ionian its bright, resolved quality vs. minor modes',
         sound: 'Bright, stable, resolved',
         chords: [
           { name: 'Cmaj7', notes: 'C E G B', fn: 'Imaj7', semitones: [0,4,7,11] },
@@ -611,7 +866,7 @@ const MODES = [
         name: 'Dorian', degree: 'ii', parent: 'Major Scale',
         intervals: [0,2,3,5,7,9,10],
         intervalNames: ['1','2','b3','4','5','6','b7'],
-        characteristic: [9], // natural 6 — the defining Dorian note
+        characteristic: [9], charDesc: 'Natural 6th — lifts Dorian above plain minor, giving it that cool, sophisticated jazz quality',
         sound: 'Minor with natural 6 — cool, sophisticated',
         chords: [
           { name: 'Cm7', notes: 'C Eb G Bb', fn: 'IIm7', semitones: [0,3,7,10] },
@@ -626,7 +881,7 @@ const MODES = [
         name: 'Phrygian', degree: 'iii', parent: 'Major Scale',
         intervals: [0,1,3,5,7,8,10],
         intervalNames: ['1','b2','b3','4','5','b6','b7'],
-        characteristic: [1], // b2 — the Spanish/flamenco sound
+        characteristic: [1], charDesc: 'b2 — the half-step above the root creates a dark, Spanish/flamenco tension',
         sound: 'Dark, Spanish, tense',
         chords: [
           { name: 'Cm7', notes: 'C Eb G Bb', fn: 'IIIm7', semitones: [0,3,7,10] },
@@ -640,7 +895,7 @@ const MODES = [
         name: 'Lydian', degree: 'IV', parent: 'Major Scale',
         intervals: [0,2,4,6,7,9,11],
         intervalNames: ['1','2','3','#4','5','6','7'],
-        characteristic: [6], // #4 / #11 — the dreamy tritone
+        characteristic: [6], charDesc: '#4 (raised 4th) — a tritone above the root, creating a dreamy, floating, unresolved quality',
         sound: 'Dreamy, floating, ethereal',
         chords: [
           { name: 'Cmaj7#11', notes: 'C E G B F#', fn: 'IVmaj7#11', semitones: [0,4,7,11,18] },
@@ -654,7 +909,7 @@ const MODES = [
         name: 'Mixolydian', degree: 'V', parent: 'Major Scale',
         intervals: [0,2,4,5,7,9,10],
         intervalNames: ['1','2','3','4','5','6','b7'],
-        characteristic: [10], // b7 — the blues/dominant sound
+        characteristic: [10], charDesc: 'b7 — the flatted 7th creates dominant tension that wants to resolve, the foundation of blues and jazz harmony',
         sound: 'Dominant, bluesy, driving',
         chords: [
           { name: 'C7', notes: 'C E G Bb', fn: 'V7', semitones: [0,4,7,10] },
@@ -666,10 +921,10 @@ const MODES = [
         examples: ['Blues in F', 'Rhythm changes (turnarounds)', 'Funk grooves'],
       },
       {
-        name: 'Aeolian', degree: 'vi', parent: 'Major Scale',
+        name: 'Aeolian', subtitle: 'minor scale', degree: 'vi', parent: 'Major Scale',
         intervals: [0,2,3,5,7,8,10],
         intervalNames: ['1','2','b3','4','5','b6','b7'],
-        characteristic: [8], // b6 — what distinguishes it from Dorian
+        characteristic: [8], charDesc: 'b6 — the flatted 6th darkens the minor sound compared to Dorian\'s natural 6, making Aeolian feel sadder',
         sound: 'Sad, natural minor',
         chords: [
           { name: 'Cm7', notes: 'C Eb G Bb', fn: 'VIm7', semitones: [0,3,7,10] },
@@ -683,7 +938,7 @@ const MODES = [
         name: 'Locrian', degree: 'vii°', parent: 'Major Scale',
         intervals: [0,1,3,5,6,8,10],
         intervalNames: ['1','b2','b3','4','b5','b6','b7'],
-        characteristic: [6], // b5 — the diminished quality
+        characteristic: [6], charDesc: 'b5 — the diminished 5th makes the tonic chord unstable, giving Locrian its unresolved, tense character',
         sound: 'Unstable, diminished, tense',
         chords: [
           { name: 'Cø7', notes: 'C Eb Gb Bb', fn: 'VIIø7', semitones: [0,3,6,10] },
@@ -702,7 +957,7 @@ const MODES = [
         name: 'Melodic Minor', degree: 'i', parent: 'Melodic Minor Scale',
         intervals: [0,2,3,5,7,9,11],
         intervalNames: ['1','2','b3','4','5','6','7'],
-        characteristic: [11], // major 7 over minor chord
+        characteristic: [11], charDesc: 'Major 7th over a minor chord — the clash between minor 3rd and major 7th creates that bittersweet "James Bond" sound',
         sound: 'Bittersweet — minor chord with major 7',
         chords: [
           { name: 'CmM7', notes: 'C Eb G B', fn: 'ImM7', semitones: [0,3,7,11] },
@@ -716,7 +971,7 @@ const MODES = [
         name: 'Dorian b2', degree: 'ii', parent: 'Melodic Minor Scale',
         intervals: [0,1,3,5,7,9,10],
         intervalNames: ['1','b2','b3','4','5','6','b7'],
-        characteristic: [1], // b2 over Dorian framework
+        characteristic: [1], charDesc: 'b2 over a Dorian framework — adds dark, exotic tension while keeping the natural 6th of Dorian',
         sound: 'Dark Dorian, exotic',
         chords: [
           { name: 'Cm7', notes: 'C Eb G Bb', fn: 'IIm7', semitones: [0,3,7,10] },
@@ -730,7 +985,7 @@ const MODES = [
         name: 'Lydian Augmented', degree: 'bIII+', parent: 'Melodic Minor Scale',
         intervals: [0,2,4,6,8,9,11],
         intervalNames: ['1','2','3','#4','#5','6','7'],
-        characteristic: [8], // #5 augmented note
+        characteristic: [8], charDesc: '#5 (augmented 5th) — raises the 5th a half step, creating a surreal, ungrounded quality on top of Lydian\'s already floating #4',
         sound: 'Dreamy, augmented, surreal',
         chords: [
           { name: 'Cmaj7#5', notes: 'C E G# B', fn: 'IIImaj7#5', semitones: [0,4,8,11] },
@@ -744,7 +999,7 @@ const MODES = [
         name: 'Lydian Dominant', degree: 'IV', parent: 'Melodic Minor Scale',
         intervals: [0,2,4,6,7,9,10],
         intervalNames: ['1','2','3','#4','5','6','b7'],
-        characteristic: [6], // #4 over dominant chord
+        characteristic: [6], charDesc: '#4 (tritone) over a dominant chord — the tritone sub flavor that gives Lydian Dominant its bright, modern jazz sound',
         sound: 'Bright dominant, tritone sub flavor',
         chords: [
           { name: 'C7#11', notes: 'C E G Bb F#', fn: 'IV7#11', semitones: [0,4,7,10,18] },
@@ -759,7 +1014,7 @@ const MODES = [
         name: 'Mixolydian b6', degree: 'V', parent: 'Melodic Minor Scale',
         intervals: [0,2,4,5,7,8,10],
         intervalNames: ['1','2','3','4','5','b6','b7'],
-        characteristic: [8], // b6 over dominant
+        characteristic: [8], charDesc: 'b6 (b13) over a dominant chord — adds a dark, mysterious color without the full chaos of the altered scale',
         sound: 'Mysterious dominant, Hindu scale',
         chords: [
           { name: 'C7b13', notes: 'C E G Bb Ab', fn: 'V7b13', semitones: [0,4,7,10,20] },
@@ -773,7 +1028,7 @@ const MODES = [
         name: 'Locrian #2', degree: 'viø', parent: 'Melodic Minor Scale',
         intervals: [0,2,3,5,6,8,10],
         intervalNames: ['1','2','b3','4','b5','b6','b7'],
-        characteristic: [2], // natural 2 (vs b2 in Locrian)
+        characteristic: [2], charDesc: 'Natural 2 — compared to Locrian\'s b2, this opens up the half-diminished chord and makes it far more playable in minor II–V–I',
         sound: 'Half-diminished, less tense than Locrian',
         chords: [
           { name: 'Cø7', notes: 'C Eb Gb Bb', fn: 'VIø7', semitones: [0,3,6,10] },
@@ -787,7 +1042,7 @@ const MODES = [
         name: 'Altered Scale', degree: 'vii', parent: 'Melodic Minor Scale',
         intervals: [0,1,3,4,6,8,10],
         intervalNames: ['1','b2','#2','3','b5','b6','b7'],
-        characteristic: [1], // all altered tensions
+        characteristic: [1], charDesc: 'b9 — the lowest altered tension, but the whole scale is built from altered notes: b9, #9, b5, b13 all present',
         sound: 'Maximum tension — all altered notes',
         chords: [
           { name: 'C7alt', notes: 'C E Bb + b9 #9 b13', fn: 'V7alt', semitones: [0,4,10,13,15,20] },
@@ -807,7 +1062,7 @@ const MODES = [
         name: 'Whole Tone', degree: '—', parent: 'Whole Tone Scale',
         intervals: [0,2,4,6,8,10],
         intervalNames: ['1','2','3','#4','#5','b7'],
-        characteristic: [6],
+        characteristic: [6], charDesc: '#4 and #5 simultaneously — every interval is a whole step, removing all half-step gravity and making the scale feel directionless',
         sound: 'Floating, ambiguous, Debussy',
         chords: [
           { name: 'C7#5', notes: 'C E G# Bb', fn: 'V7aug', semitones: [0,4,8,10] },
@@ -899,16 +1154,364 @@ const MODES = [
 
 let currentMode = MODES[0].modes[1]; // default: Dorian
 let currentRoot = 'C';
+let currentView = 'modes'; // 'modes' | 'chords'
+
+const CHORD_TYPES = [
+  {
+    group: 'Triads',
+    chords: [
+      { type: 'Major',      suffix: '',      formula: '1–3–5',    semitones: [0,4,7] },
+      { type: 'Minor',      suffix: 'm',     formula: '1–b3–5',   semitones: [0,3,7] },
+      { type: 'Augmented',  suffix: 'aug',   formula: '1–3–#5',   semitones: [0,4,8] },
+      { type: 'Diminished', suffix: 'dim',   formula: '1–b3–b5',  semitones: [0,3,6] },
+      { type: 'Sus2',       suffix: 'sus2',  formula: '1–2–5',    semitones: [0,2,7] },
+      { type: 'Sus4',       suffix: 'sus4',  formula: '1–4–5',    semitones: [0,5,7] },
+    ]
+  },
+  {
+    group: '6th Chords',
+    chords: [
+      { type: 'Major 6',    suffix: '6',     formula: '1–3–5–6',      semitones: [0,4,7,9]    },
+      { type: 'Minor 6',    suffix: 'm6',    formula: '1–b3–5–6',     semitones: [0,3,7,9]    },
+      { type: '6/9',        suffix: '6/9',   formula: '1–3–5–6–9',    semitones: [0,4,7,9,14] },
+      { type: 'Minor 6/9',  suffix: 'm6/9',  formula: '1–b3–5–6–9',   semitones: [0,3,7,9,14] },
+    ]
+  },
+  {
+    group: '7th Chords',
+    chords: [
+      { type: 'Major 7',        suffix: 'maj7',     formula: '1–3–5–7',      semitones: [0,4,7,11]  },
+      { type: 'Dominant 7',     suffix: '7',        formula: '1–3–5–b7',     semitones: [0,4,7,10]  },
+      { type: 'Minor 7',        suffix: 'm7',       formula: '1–b3–5–b7',    semitones: [0,3,7,10]  },
+      { type: 'Half-Dim (ø7)',  suffix: 'ø7',       formula: '1–b3–b5–b7',   semitones: [0,3,6,10]  },
+      { type: 'Diminished 7',   suffix: 'dim7',     formula: '1–b3–b5–bb7',  semitones: [0,3,6,9]   },
+      { type: 'Minor-Major 7',  suffix: 'mMaj7',    formula: '1–b3–5–7',     semitones: [0,3,7,11]  },
+      { type: 'Augmented 7',    suffix: 'aug7',     formula: '1–3–#5–b7',    semitones: [0,4,8,10]  },
+      { type: 'Aug Major 7',    suffix: 'augMaj7',  formula: '1–3–#5–7',     semitones: [0,4,8,11]  },
+      { type: 'Dom 7sus4',      suffix: '7sus4',    formula: '1–4–5–b7',     semitones: [0,5,7,10]  },
+      { type: 'Dom 7sus2',      suffix: '7sus2',    formula: '1–2–5–b7',     semitones: [0,2,7,10]  },
+      { type: 'Dom 7b5',        suffix: '7b5',      formula: '1–3–b5–b7',    semitones: [0,4,6,10]  },
+      { type: 'Major 7b5',      suffix: 'maj7b5',   formula: '1–3–b5–7',     semitones: [0,4,6,11]  },
+    ]
+  },
+  {
+    group: '9th Chords',
+    chords: [
+      { type: 'Major 9',       suffix: 'maj9',     formula: '1–3–5–7–9',      semitones: [0,4,7,11,14]    },
+      { type: 'Dominant 9',    suffix: '9',        formula: '1–3–5–b7–9',     semitones: [0,4,7,10,14]    },
+      { type: 'Minor 9',       suffix: 'm9',       formula: '1–b3–5–b7–9',    semitones: [0,3,7,10,14]    },
+      { type: 'Minor-Major 9', suffix: 'mMaj9',    formula: '1–b3–5–7–9',     semitones: [0,3,7,11,14]    },
+      { type: 'Add9',          suffix: 'add9',     formula: '1–3–5–9',        semitones: [0,4,7,14]       },
+      { type: 'Minor Add9',    suffix: 'm(add9)',  formula: '1–b3–5–9',       semitones: [0,3,7,14]       },
+      { type: '7b9',           suffix: '7b9',      formula: '1–3–5–b7–b9',    semitones: [0,4,7,10,13]    },
+      { type: '7#9',           suffix: '7#9',      formula: '1–3–5–b7–#9',    semitones: [0,4,7,10,15]    },
+      { type: '9sus4',         suffix: '9sus4',    formula: '1–4–5–b7–9',     semitones: [0,5,7,10,14]    },
+      { type: '9#11',          suffix: '9#11',     formula: '1–3–5–b7–9–#11', semitones: [0,4,7,10,14,18] },
+      { type: 'Maj9 #11',      suffix: 'maj9#11',  formula: '1–3–5–7–9–#11',  semitones: [0,4,7,11,14,18] },
+      { type: '7b9 #11',       suffix: '7b9#11',   formula: '1–3–5–b7–b9–#11',semitones: [0,4,7,10,13,18] },
+      { type: '7#9 #11',       suffix: '7#9#11',   formula: '1–3–5–b7–#9–#11',semitones: [0,4,7,10,15,18] },
+    ]
+  },
+  {
+    group: '11th Chords',
+    chords: [
+      { type: 'Minor 11',    suffix: 'm11',   formula: '1–b3–5–b7–9–11',  semitones: [0,3,7,10,14,17] },
+      { type: 'Dominant 11', suffix: '11',    formula: '1–5–b7–9–11',     semitones: [0,7,10,14,17]   },
+      { type: 'Major 11',    suffix: 'maj11', formula: '1–5–7–9–11',      semitones: [0,7,11,14,17]   },
+    ]
+  },
+  {
+    group: '13th Chords',
+    chords: [
+      { type: 'Major 13',       suffix: 'maj13',    formula: '1–3–5–7–9–13',       semitones: [0,4,7,11,14,21]    },
+      { type: 'Dominant 13',    suffix: '13',       formula: '1–3–5–b7–9–13',      semitones: [0,4,7,10,14,21]    },
+      { type: 'Minor 13',       suffix: 'm13',      formula: '1–b3–5–b7–9–13',     semitones: [0,3,7,10,14,21]    },
+      { type: 'Minor-Major 13', suffix: 'mMaj13',   formula: '1–b3–5–7–9–13',      semitones: [0,3,7,11,14,21]    },
+      { type: '13b9',           suffix: '13b9',     formula: '1–3–5–b7–b9–13',     semitones: [0,4,7,10,13,21]    },
+      { type: '13#9',           suffix: '13#9',     formula: '1–3–5–b7–#9–13',     semitones: [0,4,7,10,15,21]    },
+      { type: '13#11',          suffix: '13#11',    formula: '1–3–5–b7–9–#11–13',  semitones: [0,4,7,10,14,18,21] },
+      { type: '13b9 #11',       suffix: '13b9#11',  formula: '1–3–5–b7–b9–#11–13', semitones: [0,4,7,10,13,18,21] },
+      { type: 'Major 13#11',    suffix: 'maj13#11', formula: '1–3–5–7–9–#11–13',   semitones: [0,4,7,11,14,18,21] },
+    ]
+  },
+  {
+    group: 'Altered Dominants',
+    chords: [
+      { type: '7alt',      suffix: '7alt',    formula: '1–3–b7–b9–#9–b13', semitones: [0,4,10,13,15,20] },
+      { type: '7b9 b13',   suffix: '7b9b13',  formula: '1–3–5–b7–b9–b13', semitones: [0,4,7,10,13,20]  },
+      { type: '7#9 b13',   suffix: '7#9b13',  formula: '1–3–5–b7–#9–b13', semitones: [0,4,7,10,15,20]  },
+      { type: '7b5 b9',    suffix: '7b5b9',   formula: '1–3–b5–b7–b9',    semitones: [0,4,6,10,13]     },
+      { type: '7b5 #9',    suffix: '7b5#9',   formula: '1–3–b5–b7–#9',    semitones: [0,4,6,10,15]     },
+      { type: '7#5 b9',    suffix: '7#5b9',   formula: '1–3–#5–b7–b9',    semitones: [0,4,8,10,13]     },
+      { type: '7#5 #9',    suffix: '7#5#9',   formula: '1–3–#5–b7–#9',    semitones: [0,4,8,10,15]     },
+      { type: '7b9 #9',    suffix: '7b9#9',   formula: '1–3–5–b7–b9–#9',  semitones: [0,4,7,10,13,15]  },
+    ]
+  },
+  {
+    group: 'Inversions',
+    chords: [
+      { type: 'Maj 1st Inv',  suffix: '',       formula: '3–5–1',      semitones: [0,3,8],   bassOffset: 4  },
+      { type: 'Maj 2nd Inv',  suffix: '',       formula: '5–1–3',      semitones: [0,5,9],   bassOffset: 7  },
+      { type: 'Min 1st Inv',  suffix: 'm',      formula: 'b3–5–1',     semitones: [0,4,9],   bassOffset: 3  },
+      { type: 'Min 2nd Inv',  suffix: 'm',      formula: '5–1–b3',     semitones: [0,5,8],   bassOffset: 7  },
+      { type: 'Maj7 1st Inv', suffix: 'maj7',   formula: '3–5–7–1',    semitones: [0,3,7,8], bassOffset: 4  },
+      { type: 'Maj7 2nd Inv', suffix: 'maj7',   formula: '5–7–1–3',    semitones: [0,4,5,9], bassOffset: 7  },
+      { type: 'Maj7 3rd Inv', suffix: 'maj7',   formula: '7–1–3–5',    semitones: [0,1,5,8], bassOffset: 11 },
+      { type: 'Dom7 1st Inv', suffix: '7',      formula: '3–5–b7–1',   semitones: [0,3,6,8], bassOffset: 4  },
+      { type: 'Dom7 2nd Inv', suffix: '7',      formula: '5–b7–1–3',   semitones: [0,3,5,9], bassOffset: 7  },
+      { type: 'Dom7 3rd Inv', suffix: '7',      formula: 'b7–1–3–5',   semitones: [0,2,6,9], bassOffset: 10 },
+      { type: 'Min7 1st Inv', suffix: 'm7',     formula: 'b3–5–b7–1',  semitones: [0,4,7,9], bassOffset: 3  },
+      { type: 'Min7 2nd Inv', suffix: 'm7',     formula: '5–b7–1–b3',  semitones: [0,3,5,8], bassOffset: 7  },
+      { type: 'Min7 3rd Inv', suffix: 'm7',     formula: 'b7–1–b3–5',  semitones: [0,2,5,9], bassOffset: 10 },
+    ]
+  },
+];
+
+const PROGRESSIONS = [
+  {
+    group: 'Getting Started',
+    groupDesc: 'Two- and three-chord foundations — start here before diving into jazz',
+    items: [
+      {
+        name: 'I–V',
+        desc: 'Two-chord tension & release',
+        summary: 'The simplest harmonic motion in music. V always wants to resolve back to I — this push-pull is the engine behind all Western harmony. Practice it slowly in every key.',
+        chords: [
+          { degree: 'Imaj7', semitone: 0, suffix: 'maj7', semitones: [0,4,7,11] },
+          { degree: 'V7',    semitone: 7, suffix: '7',    semitones: [0,4,7,10] },
+        ]
+      },
+      {
+        name: 'I–IV',
+        desc: 'Plagal motion — the "Amen" cadence',
+        summary: 'Moving to IV and back is called plagal motion. It sounds gentle and resolved compared to V–I. This is the sound of gospel "Amens" and the blues IV chord in bar 5.',
+        chords: [
+          { degree: 'Imaj7',  semitone: 0, suffix: 'maj7', semitones: [0,4,7,11] },
+          { degree: 'IVmaj7', semitone: 5, suffix: 'maj7', semitones: [0,4,7,11] },
+        ]
+      },
+      {
+        name: 'I–IV–V',
+        desc: 'Three-chord blues foundation',
+        summary: 'The most universal chord progression in Western music. In jazz these are dominant 7ths, giving a slightly tense, bluesy sound. Master this in all 12 keys before anything else.',
+        chords: [
+          { degree: 'I7',  semitone: 0, suffix: '7', semitones: [0,4,7,10] },
+          { degree: 'IV7', semitone: 5, suffix: '7', semitones: [0,4,7,10] },
+          { degree: 'V7',  semitone: 7, suffix: '7', semitones: [0,4,7,10] },
+        ]
+      },
+      {
+        name: 'I–vi–IV–V',
+        desc: '"50s progression" — Stand By Me, Heart and Soul',
+        summary: 'The vi chord (relative minor) creates an emotional dip before IV and V pull back home. You will hear this in countless songs across pop, doo-wop, and jazz ballads.',
+        chords: [
+          { degree: 'Imaj7',  semitone: 0, suffix: 'maj7', semitones: [0,4,7,11] },
+          { degree: 'VIm7',   semitone: 9, suffix: 'm7',   semitones: [0,3,7,10] },
+          { degree: 'IVmaj7', semitone: 5, suffix: 'maj7', semitones: [0,4,7,11] },
+          { degree: 'V7',     semitone: 7, suffix: '7',    semitones: [0,4,7,10] },
+        ]
+      },
+      {
+        name: 'I–vi–II–V',
+        desc: 'Jazz turnaround — loops back to I endlessly',
+        summary: 'The essential jazz turnaround. It cycles perfectly back to I, making it loop naturally. This is the A-section of Rhythm Changes (I Got Rhythm) and the basis of hundreds of standards.',
+        chords: [
+          { degree: 'Imaj7', semitone: 0, suffix: 'maj7', semitones: [0,4,7,11] },
+          { degree: 'VIm7',  semitone: 9, suffix: 'm7',   semitones: [0,3,7,10] },
+          { degree: 'IIm7',  semitone: 2, suffix: 'm7',   semitones: [0,3,7,10] },
+          { degree: 'V7',    semitone: 7, suffix: '7',    semitones: [0,4,7,10] },
+        ]
+      },
+    ]
+  },
+  {
+    group: 'Jazz Progressions',
+    groupDesc: 'Core harmonic vocabulary every jazz musician needs to know',
+    items: [
+      {
+        name: 'II–V–I (Major)',
+        desc: 'The cornerstone of jazz harmony',
+        summary: 'IIm7 → V7 → Imaj7. The II sets up the V, the V resolves to I. This three-chord move appears in virtually every standard. Learn to hear and play it in all 12 keys — it is the foundation.',
+        chords: [
+          { degree: 'IIm7',  semitone: 2, suffix: 'm7',   semitones: [0,3,7,10] },
+          { degree: 'V7',    semitone: 7, suffix: '7',    semitones: [0,4,7,10] },
+          { degree: 'Imaj7', semitone: 0, suffix: 'maj7', semitones: [0,4,7,11] },
+        ]
+      },
+      {
+        name: 'II–V–I (Minor)',
+        desc: 'Minor key resolution — darker and more tense',
+        summary: 'IIø7 → V7alt → Im. The half-diminished II and altered V pack in b9, #9, and b13 tensions. The resolution to Im feels heavier and more dramatic than the major version.',
+        chords: [
+          { degree: 'IIø7',  semitone: 2, suffix: 'ø7',   semitones: [0,3,6,10]     },
+          { degree: 'V7alt', semitone: 7, suffix: '7alt',  semitones: [0,4,10,13,15] },
+          { degree: 'Im',    semitone: 0, suffix: 'm',     semitones: [0,3,7]        },
+        ]
+      },
+      {
+        name: 'I–IV–V Jazz Blues',
+        desc: 'All dominant 7ths — the blues sound',
+        summary: 'Making all three chords dominant 7ths gives the slightly unresolved, bluesy tension that defines the jazz blues. The IV7 in bar 5 is the signature move. Add chromatic passing chords as you grow.',
+        chords: [
+          { degree: 'I7',  semitone: 0, suffix: '7', semitones: [0,4,7,10] },
+          { degree: 'IV7', semitone: 5, suffix: '7', semitones: [0,4,7,10] },
+          { degree: 'V7',  semitone: 7, suffix: '7', semitones: [0,4,7,10] },
+        ]
+      },
+      {
+        name: 'I–IVm–I–V',
+        desc: 'Major with a minor IV — bittersweet color',
+        summary: 'Borrowing the minor IV from the parallel minor key adds a wistful, unexpected color before returning home. Common in jazz ballads and film music.',
+        chords: [
+          { degree: 'Imaj7',  semitone: 0, suffix: 'maj7', semitones: [0,4,7,11] },
+          { degree: 'IVm7',   semitone: 5, suffix: 'm7',   semitones: [0,3,7,10] },
+          { degree: 'Imaj7',  semitone: 0, suffix: 'maj7', semitones: [0,4,7,11] },
+          { degree: 'V7',     semitone: 7, suffix: '7',    semitones: [0,4,7,10] },
+        ]
+      },
+      {
+        name: 'Minor Plagal Vamp',
+        desc: 'Im → IVm — heavy, modal, no resolution',
+        summary: 'No dominant chord means no real tension or pull. The motion between Im and IVm is dark and static — perfect for modal jazz, soul vamps, and film underscore that needs to hover.',
+        chords: [
+          { degree: 'Im7',  semitone: 0, suffix: 'm7', semitones: [0,3,7,10] },
+          { degree: 'IVm7', semitone: 5, suffix: 'm7', semitones: [0,3,7,10] },
+        ]
+      },
+    ]
+  },
+  {
+    group: 'Substitutions',
+    groupDesc: 'Advanced harmonic moves from bebop and modern jazz',
+    items: [
+      {
+        name: 'Tritone Substitution',
+        desc: 'bII7 replaces V7 — same tritone, chromatic bass',
+        summary: 'The bII7 chord shares the exact same tritone (3rd and 7th) as V7, so it resolves equally well. But the bass moves by half-step into I instead of a 5th, creating a smooth, chromatic line.',
+        chords: [
+          { degree: 'IIm7',  semitone: 2, suffix: 'm7',   semitones: [0,3,7,10] },
+          { degree: 'bII7',  semitone: 1, suffix: '7',    semitones: [0,4,7,10] },
+          { degree: 'Imaj7', semitone: 0, suffix: 'maj7', semitones: [0,4,7,11] },
+        ]
+      },
+      {
+        name: 'Coltrane Changes',
+        desc: 'Giant Steps — key centers a major 3rd apart',
+        summary: "John Coltrane divided the octave into three equal major 3rds (I, bIII, bVI), cycling through all three before returning. Heard on Giant Steps and Countdown. The harmonic rhythm moves so fast there's almost no time to breathe.",
+        chords: [
+          { degree: 'Imaj7',    semitone: 0, suffix: 'maj7', semitones: [0,4,7,11] },
+          { degree: 'bIIImaj7', semitone: 3, suffix: 'maj7', semitones: [0,4,7,11] },
+          { degree: 'bVImaj7',  semitone: 8, suffix: 'maj7', semitones: [0,4,7,11] },
+          { degree: 'Imaj7',    semitone: 0, suffix: 'maj7', semitones: [0,4,7,11] },
+        ]
+      },
+      {
+        name: 'Backdoor II–V',
+        desc: 'Approach I from below via bVII7',
+        summary: 'Instead of V7 resolving down a 5th to I, the bVII7 resolves up a half-step. The bass "sneaks in the back door." Borrowed from the parallel minor key — gives a bluesy, unexpected warmth.',
+        chords: [
+          { degree: 'bVII7', semitone: 10, suffix: '7',    semitones: [0,4,7,10] },
+          { degree: 'IV7',   semitone: 5,  suffix: '7',    semitones: [0,4,7,10] },
+          { degree: 'Imaj7', semitone: 0,  suffix: 'maj7', semitones: [0,4,7,11] },
+        ]
+      },
+      {
+        name: 'Bird Blues (simplified)',
+        desc: 'Charlie Parker reharmonization of the 12-bar blues',
+        summary: 'Parker filled the standard blues with II–V substitutions. Bar 3 borrows Im7 (minor IV), bar 5 inserts a III–VI sub, and bars 9–12 become a II–V–I turnaround. Dense but incredibly swinging.',
+        chords: [
+          { degree: 'Imaj7', semitone: 0, suffix: 'maj7', semitones: [0,4,7,11] },
+          { degree: 'IV7',   semitone: 5, suffix: '7',    semitones: [0,4,7,10] },
+          { degree: 'IIIm7', semitone: 4, suffix: 'm7',   semitones: [0,3,7,10] },
+          { degree: 'VI7',   semitone: 9, suffix: '7',    semitones: [0,4,7,10] },
+          { degree: 'IIm7',  semitone: 2, suffix: 'm7',   semitones: [0,3,7,10] },
+          { degree: 'V7',    semitone: 7, suffix: '7',    semitones: [0,4,7,10] },
+        ]
+      },
+    ]
+  },
+];
 
 function getScaleNotes(root, intervals) {
   const ri = CHROMATIC.indexOf(root);
   return intervals.map(i => CHROMATIC[(ri + i) % 12]);
 }
 
+function chordIcon() {
+  return `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="4" cy="10" r="2"/><circle cx="11" cy="7" r="2"/><line x1="6" y1="9.1" x2="9" y2="7.9"/><line x1="4" y1="8" x2="4" y2="2"/><line x1="11" y1="5" x2="11" y2="1"/></svg>`;
+}
+function modesIcon() {
+  return `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><line x1="2" y1="4" x2="12" y2="4"/><line x1="2" y1="7" x2="10" y2="7"/><line x1="2" y1="10" x2="8" y2="10"/></svg>`;
+}
+
 function renderSidebar() {
   // Desktop sidebar
   const sidebar = document.getElementById('sidebar');
   sidebar.innerHTML = '';
+
+  // Top nav
+  const nav = document.createElement('div');
+  nav.className = 'sidebar-nav';
+
+  const cpBtn = document.createElement('button');
+  cpBtn.className = 'sidebar-nav-btn' + (currentView === 'chords' ? ' active' : '');
+  cpBtn.innerHTML = chordIcon() + 'Chord Progression';
+  cpBtn.onclick = () => {
+    if (playbackStop) playbackStop();
+    currentView = 'chords';
+    renderChordProgressionView();
+    renderSidebar();
+  };
+
+  const chordsBtn = document.createElement('button');
+  chordsBtn.className = 'sidebar-nav-btn' + (currentView === 'chordtypes' ? ' active' : '');
+  chordsBtn.innerHTML = chordIcon() + 'Chords';
+  chordsBtn.onclick = () => {
+    if (playbackStop) playbackStop();
+    currentView = 'chordtypes';
+    renderChordTypesView();
+    renderSidebar();
+  };
+
+  nav.appendChild(cpBtn);
+  nav.appendChild(chordsBtn);
+  sidebar.appendChild(nav);
+
+  // Modes section — always visible; clicking header or any mode instantly opens it
+  const modesHeader = document.createElement('button');
+  modesHeader.className = 'sidebar-nav-btn' + (currentView === 'modes' ? ' active' : '');
+  modesHeader.innerHTML = modesIcon() + 'Modes';
+  modesHeader.onclick = () => {
+    if (playbackStop) playbackStop();
+    currentView = 'modes';
+    renderMain();
+    renderSidebar();
+  };
+  sidebar.appendChild(modesHeader);
+
+  // Quick-jump to Ionian and Dorian
+  const quickJump = document.createElement('div');
+  quickJump.className = 'quick-jump';
+  [
+    { label: 'Ionian',  group: 0, idx: 0 },
+    { label: 'Dorian',  group: 0, idx: 1 },
+    { label: 'Mixolyd', group: 0, idx: 4 },
+    { label: 'Alt',     group: 1, idx: 6 },
+  ].forEach(({ label, group, idx }) => {
+    const btn = document.createElement('button');
+    btn.className = 'quick-jump-btn';
+    btn.textContent = label;
+    btn.onclick = () => {
+      if (playbackStop) playbackStop();
+      currentView = 'modes';
+      currentMode = MODES[group].modes[idx];
+      renderMain();
+      renderSidebar();
+    };
+    quickJump.appendChild(btn);
+  });
+  sidebar.appendChild(quickJump);
+
   MODES.forEach(group => {
     const label = document.createElement('div');
     label.className = 'group-label';
@@ -917,9 +1520,15 @@ function renderSidebar() {
 
     group.modes.forEach(mode => {
       const btn = document.createElement('button');
-      btn.className = 'mode-btn' + (mode === currentMode ? ' active' : '');
-      btn.innerHTML = `${mode.name}<span class="degree">${mode.degree}</span>`;
-      btn.onclick = () => { if (playbackStop) playbackStop(); currentMode = mode; renderMain(); renderSidebar(); };
+      btn.className = 'mode-btn' + (mode === currentMode && currentView === 'modes' ? ' active' : '');
+      btn.innerHTML = `${mode.name}${mode.subtitle ? `<span class="mode-subtitle"> (${mode.subtitle})</span>` : ''}<span class="degree">${mode.degree}</span>`;
+      btn.onclick = () => {
+        if (playbackStop) playbackStop();
+        currentView = 'modes';
+        currentMode = mode;
+        renderMain();
+        renderSidebar();
+      };
       sidebar.appendChild(btn);
     });
   });
@@ -939,6 +1548,371 @@ function renderSidebar() {
       og.appendChild(opt);
     });
     mSel.appendChild(og);
+  });
+}
+
+function qualityLabel(suffix) {
+  const q = {
+    '': 'Major', 'm': 'Minor', 'aug': 'Augmented', 'dim': 'Diminished',
+    'sus2': 'Sus 2', 'sus4': 'Sus 4',
+    'maj7': 'Major 7th', '7': 'Dominant 7th', 'm7': 'Minor 7th',
+    'ø7': 'Half-Dim 7th', '7alt': 'Altered Dom', 'dim7': 'Diminished 7th',
+    'mMaj7': 'Minor-Maj 7th', 'aug7': 'Augmented 7th', 'augMaj7': 'Aug Maj 7th',
+    '7sus4': 'Dom 7sus4', '7sus2': 'Dom 7sus2', '7b5': 'Dom 7♭5',
+    'maj9': 'Major 9th', '9': 'Dominant 9th', 'm9': 'Minor 9th',
+    'mMaj9': 'Min-Maj 9th', 'add9': 'Add 9', 'm(add9)': 'Min Add9',
+    '7b9': 'Dom 7♭9', '7#9': 'Dom 7♯9', '9sus4': 'Dom 9sus4',
+    '9#11': 'Lyd Dominant', 'maj9#11': 'Lydian Maj9',
+    'm11': 'Minor 11th', '11': 'Dominant 11th',
+    'maj13': 'Major 13th', '13': 'Dominant 13th', 'm13': 'Minor 13th',
+    '13b9': '13 ♭9', '13#9': '13 ♯9', '13#11': '13 ♯11',
+  };
+  return q[suffix] !== undefined ? q[suffix] : (suffix || 'Major');
+}
+
+function roleFor(semitone) {
+  const roles = {
+    0:  { label: 'Tonic',       color: 'rest'    },
+    1:  { label: 'Chromatic',   color: 'tension' },
+    2:  { label: 'Supertonic',  color: 'buildup' },
+    3:  { label: 'Mediant',     color: 'neutral' },
+    4:  { label: 'Mediant',     color: 'neutral' },
+    5:  { label: 'Subdominant', color: 'buildup' },
+    6:  { label: 'Tritone',     color: 'tension' },
+    7:  { label: 'Dominant',    color: 'tension' },
+    8:  { label: 'Submediant',  color: 'neutral' },
+    9:  { label: 'Submediant',  color: 'neutral' },
+    10: { label: 'Subtonic',    color: 'buildup' },
+    11: { label: 'Leading',     color: 'tension' },
+  };
+  return roles[semitone] || { label: 'Chord', color: 'neutral' };
+}
+
+// small inline piano for a chord (1 octave + C D E, lights up chord notes)
+const CP_PIANO_WHITE = ['C','D','E','F','G','A','B'];
+const CP_PIANO_BLACK = [
+  {note:'C#',left:16},{note:'D#',left:43},
+  {note:'F#',left:99},{note:'G#',left:126},{note:'A#',left:153}
+];
+// 3 extra high keys (next octave: C D E + their sharps)
+const CP_EXTRA_WHITE = ['C','D','E'];
+const CP_EXTRA_BLACK = [{note:'C#',left:16},{note:'D#',left:43}];
+const CP_KW = 22, CP_KH = 76;
+
+// Build the piano DOM; keys start unlit. Returns the outer wrapper.
+// The inner container is wrapper._pianoContainer for updatePianoLit.
+function buildChordPiano(noteNames) {
+  const totalWhite = CP_PIANO_WHITE.length + CP_EXTRA_WHITE.length; // 10
+  const container = document.createElement('div');
+  container.style.cssText = `display:inline-block;position:relative;height:${CP_KH}px;overflow:hidden;width:${CP_KW * totalWhite}px;`;
+
+  // Main octave white keys
+  CP_PIANO_WHITE.forEach((n, wi) => {
+    const key = document.createElement('div');
+    key.className = 'cp-piano-white';
+    key.dataset.note = n;
+    key.style.cssText = `left:${wi * CP_KW}px;top:0;width:${CP_KW - 1}px;height:${CP_KH}px;`;
+    container.appendChild(key);
+  });
+  // Main octave black keys
+  CP_PIANO_BLACK.forEach(({note, left}) => {
+    const key = document.createElement('div');
+    key.className = 'cp-piano-black';
+    key.dataset.note = note;
+    key.style.cssText = `left:${left}px;top:0;width:14px;height:48px;`;
+    container.appendChild(key);
+  });
+
+  // Extra 3 white keys (C D E of next octave)
+  const extraOff = CP_PIANO_WHITE.length * CP_KW;
+  CP_EXTRA_WHITE.forEach((n, wi) => {
+    const key = document.createElement('div');
+    key.className = 'cp-piano-white cp-piano-extra';
+    key.dataset.note = n;
+    key.style.cssText = `left:${extraOff + wi * CP_KW}px;top:0;width:${CP_KW - 1}px;height:${CP_KH}px;`;
+    container.appendChild(key);
+  });
+  // Extra black keys (C# D# of next octave)
+  CP_EXTRA_BLACK.forEach(({note, left}) => {
+    const key = document.createElement('div');
+    key.className = 'cp-piano-black cp-piano-extra';
+    key.dataset.note = note;
+    key.style.cssText = `left:${extraOff + left}px;top:0;width:14px;height:48px;`;
+    container.appendChild(key);
+  });
+
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'overflow-x:auto;overflow-y:hidden;padding-bottom:4px;height:88px;';
+  wrapper.appendChild(container);
+  wrapper._pianoContainer = container;
+
+  // Light up initial notes if provided
+  if (noteNames && noteNames.length) updatePianoLit(wrapper, noteNames);
+  return wrapper;
+}
+
+// Update lit keys on an existing piano wrapper.
+// noteNames: array of note name strings to light up.
+// strumDelays (optional): [{note, delay}] for staggered animation.
+// Pass empty noteNames to clear all lit keys.
+function updatePianoLit(wrapper, noteNames, strumDelays) {
+  const container = wrapper._pianoContainer;
+  if (!container) return;
+  const delayMap = {};
+  if (strumDelays) strumDelays.forEach(({note, delay}) => { delayMap[note] = delay; });
+  container.querySelectorAll('.cp-piano-white:not(.cp-piano-extra), .cp-piano-black:not(.cp-piano-extra)').forEach(key => {
+    const n = key.dataset.note;
+    const isLit = noteNames.includes(n);
+    if (isLit) {
+      const d = delayMap[n] !== undefined ? delayMap[n] : 0;
+      // Force animation restart: remove class, reflow, re-add
+      key.classList.remove('lit');
+      key.style.animationDelay = d + 's';
+      void key.offsetWidth; // trigger reflow
+      key.classList.add('lit');
+    } else {
+      key.classList.remove('lit');
+      key.style.animationDelay = '';
+      key.style.animation = 'none';
+      void key.offsetWidth;
+      key.style.animation = '';
+    }
+  });
+}
+
+function renderChordProgressionView() {
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  const root = currentRoot;
+  const ri = CHROMATIC.indexOf(root);
+
+  const header = document.createElement('div');
+  header.className = 'mode-header';
+  header.innerHTML = `
+    <h2>Chord Progressions</h2>
+    <div class="parent">Root: <strong style="color:#c8a96e">${root}</strong> &nbsp;·&nbsp; All chords transposed</div>
+    <div class="sound-tag">Getting Started · Jazz · Substitutions</div>
+  `;
+  main.appendChild(header);
+
+  PROGRESSIONS.forEach(group => {
+    const section = document.createElement('div');
+    section.className = 'cp-section';
+
+    // Group header
+    const gHead = document.createElement('div');
+    gHead.innerHTML = `
+      <div class="cp-section-title">${group.group}</div>
+      <div style="font-size:0.74rem;color:#666;margin-top:-0.3rem;margin-bottom:1rem;">${group.groupDesc}</div>
+    `;
+    section.appendChild(gHead);
+
+    group.items.forEach(prog => {
+      const block = document.createElement('div');
+      block.style.cssText = 'margin-bottom:2.2rem;';
+
+      // ── Title row + play button ──
+      const titleRow = document.createElement('div');
+      titleRow.style.cssText = 'display:flex;align-items:baseline;justify-content:space-between;margin-bottom:0.8rem;gap:0.5rem;';
+
+      const titleEl = document.createElement('div');
+      titleEl.style.cssText = 'font-size:0.95rem;color:#c8a96e;letter-spacing:0.04em;';
+      titleEl.textContent = prog.name;
+      titleRow.appendChild(titleEl);
+
+      const pBtn = document.createElement('button');
+      pBtn.className = 'play-btn';
+      pBtn.style.cssText = 'margin-top:0;padding:0.2rem 0.7rem;font-size:0.7rem;flex-shrink:0;';
+      pBtn.innerHTML = playIcon() + ' Play';
+      titleRow.appendChild(pBtn);
+      block.appendChild(titleRow);
+
+      // ── Chord card flow ──
+      const flow = document.createElement('div');
+      flow.className = 'prog-flow';
+
+      const cardEls = [];  // for piano update
+      let activePianoEl = null;
+
+      prog.chords.forEach((ch, ci) => {
+        if (ci > 0) {
+          const arrow = document.createElement('div');
+          arrow.className = 'prog-arrow';
+          arrow.textContent = '→';
+          flow.appendChild(arrow);
+        }
+
+        const chordRoot = CHROMATIC[(ri + ch.semitone) % 12];
+        const notes = ch.semitones.map(s => CHROMATIC[(ri + ch.semitone + s) % 12]);
+        const role   = roleFor(ch.semitone);
+        const qual   = qualityLabel(ch.suffix);
+
+        const card = document.createElement('div');
+        card.className = 'prog-card';
+
+        // Numeral
+        const numEl = document.createElement('div');
+        numEl.className = 'pc-numeral';
+        numEl.textContent = ch.degree;
+        card.appendChild(numEl);
+
+        // Chord name
+        const nameEl = document.createElement('div');
+        nameEl.className = 'pc-name';
+        nameEl.textContent = chordRoot + ch.suffix;
+        card.appendChild(nameEl);
+
+        // Quality
+        const qualEl = document.createElement('div');
+        qualEl.className = 'pc-quality';
+        qualEl.textContent = qual;
+        card.appendChild(qualEl);
+
+        // Note pills — all notes, root highlighted
+        const notesEl = document.createElement('div');
+        notesEl.className = 'pc-notes';
+        notes.forEach(n => {
+          const pill = document.createElement('div');
+          pill.className = 'pc-note' + (n === chordRoot ? ' is-root' : '');
+          pill.textContent = n;
+          notesEl.appendChild(pill);
+        });
+        card.appendChild(notesEl);
+
+        // Role badge
+        const roleEl = document.createElement('div');
+        roleEl.className = `pc-role role-${role.color}`;
+        roleEl.textContent = role.label;
+        card.appendChild(roleEl);
+
+        cardEls.push({ card, notes, chordRoot, chordRi: (ri + ch.semitone) % 12, semitones: ch.semitones });
+        flow.appendChild(card);
+      });
+
+      block.appendChild(flow);
+
+      // ── Piano detail (shows notes of active card) ──
+      const pianoWrap = document.createElement('div');
+      pianoWrap.className = 'prog-detail-piano';
+      const pianoLabel = document.createElement('div');
+      pianoLabel.className = 'prog-detail-piano-label';
+      pianoLabel.textContent = 'Keyboard';
+      pianoWrap.appendChild(pianoLabel);
+      // Start with a blank piano (no lit keys until something plays or is clicked)
+      const pianoEl = buildChordPiano([]);
+      pianoWrap.appendChild(pianoEl);
+      block.appendChild(pianoWrap);
+
+      // Wire card clicks: activate card, update piano with strum animation, play chord
+      const pillEls = cardEls.map(c => c.card); // cards act as "pills" for playProgression highlight
+      const strum = 0.04;
+      cardEls.forEach(({ card, notes, chordRi, semitones }) => {
+        card.onclick = () => {
+          cardEls.forEach(c => c.card.classList.remove('pc-active'));
+          card.classList.add('pc-active');
+          // Animate keys with strum delays (low→high order)
+          const sortedNotes = semitones.map(s => CHROMATIC[(chordRi + s) % 12]);
+          const delays = sortedNotes.map((n, i) => ({ note: n, delay: i * strum }));
+          updatePianoLit(pianoEl, notes, delays);
+          playChord(chordRi, semitones, { classList: { add: ()=>{}, remove: ()=>{} } });
+        };
+      });
+
+      // Set first card active by default
+      if (cardEls.length) cardEls[0].card.classList.add('pc-active');
+
+      // play progression button — voice-lead piano update with strum animation
+      pBtn.onclick = () => playProgression(ri, prog.chords, pBtn, pillEls, (stepIdx, absPitches) => {
+        // Update active card highlight
+        cardEls.forEach(c => c.card.classList.remove('pc-active'));
+        if (cardEls[stepIdx]) cardEls[stepIdx].card.classList.add('pc-active');
+        // Animate keys with strum delays matching voice-led order (low→high)
+        const noteNames = absPitches.map(abs => CHROMATIC[abs % 12]);
+        const delays = noteNames.map((n, i) => ({ note: n, delay: i * strum }));
+        updatePianoLit(pianoEl, noteNames, delays);
+      });
+
+      // ── Summary ──
+      const descEl = document.createElement('div');
+      descEl.style.cssText = 'font-size:0.72rem;color:#666;font-style:italic;margin-bottom:0.3rem;';
+      descEl.textContent = prog.desc;
+      block.appendChild(descEl);
+
+      const summaryEl = document.createElement('div');
+      summaryEl.style.cssText = 'font-size:0.8rem;color:#999;line-height:1.65;max-width:640px;';
+      summaryEl.textContent = prog.summary;
+      block.appendChild(summaryEl);
+
+      section.appendChild(block);
+    });
+
+    main.appendChild(section);
+  });
+}
+
+function renderChordTypesView() {
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  const root = currentRoot;
+  const ri = CHROMATIC.indexOf(root);
+
+  const header = document.createElement('div');
+  header.className = 'mode-header';
+  header.innerHTML = `
+    <h2>Chords</h2>
+    <div class="parent">Root: <strong style="color:#c8a96e">${root}</strong> &nbsp;·&nbsp; All types transposed</div>
+    <div class="sound-tag">Triads · Inversions · 7ths · 9ths · 13ths</div>
+  `;
+  main.appendChild(header);
+
+  CHORD_TYPES.forEach(group => {
+    const section = document.createElement('div');
+    section.className = 'cp-section';
+
+    const title = document.createElement('div');
+    title.className = 'cp-section-title';
+    title.textContent = group.group;
+    section.appendChild(title);
+
+    const grid = document.createElement('div');
+    grid.className = 'cp-grid';
+
+    group.chords.forEach(chDef => {
+      const card = document.createElement('div');
+      card.className = 'cp-card';
+
+      let chordName;
+      if (chDef.bassOffset !== undefined) {
+        const bassNote = CHROMATIC[(ri + chDef.bassOffset) % 12];
+        chordName = `${root}${chDef.suffix}/${bassNote}`;
+      } else {
+        chordName = root + chDef.suffix;
+      }
+
+      const notes = chDef.semitones.map(s => CHROMATIC[(ri + s) % 12]);
+
+      const cPlayBtn = document.createElement('button');
+      cPlayBtn.className = 'chord-play-btn';
+      cPlayBtn.innerHTML = playIcon();
+      cPlayBtn.title = 'Play chord';
+      cPlayBtn.onclick = (e) => {
+        e.stopPropagation();
+        const playRi = chDef.bassOffset !== undefined ? (ri + chDef.bassOffset) % 12 : ri;
+        playChord(playRi, chDef.semitones, cPlayBtn);
+      };
+
+      card.innerHTML = `
+        <div class="cp-name">${chordName}</div>
+        <div class="cp-type">${chDef.type}</div>
+        <div class="cp-formula">${chDef.formula}</div>
+        <div class="cp-notes-txt">${notes.join(' · ')}</div>
+      `;
+      card.appendChild(cPlayBtn);
+      grid.appendChild(card);
+    });
+
+    section.appendChild(grid);
+    main.appendChild(section);
   });
 }
 
@@ -1143,15 +2117,15 @@ function renderMain() {
 }
 
 document.getElementById('rootSelect').addEventListener('change', e => {
-  currentRoot = e.target.value.split(' ')[0]; // handle "C# / Db"
-  // Find the actual chromatic note
   const val = e.target.value;
   if (val.includes('/')) {
     currentRoot = val.split('/')[0].trim().replace(' ', '');
   } else {
     currentRoot = val.trim();
   }
-  renderMain();
+  if (currentView === 'chords') renderChordProgressionView();
+  else if (currentView === 'chordtypes') renderChordTypesView();
+  else renderMain();
 });
 
 // ── Audio engine ────────────────────────────────────────────────────────────
@@ -1162,6 +2136,7 @@ CHROMATIC.forEach((n, i) => { NOTE_FREQ[n] = 261.63 * Math.pow(2, i / 12); });
 let audioCtx = null;
 let playbackStop   = null; // function to cancel in-progress scale playback
 let chordStop      = null; // function to cancel in-progress chord playback
+let progStop       = null; // function to cancel in-progress progression playback
 
 function getAudioCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1196,7 +2171,27 @@ function playScale(scaleNotes, btn, pianoEl) {
   // Each scale note = one quarter note at the current BPM
   const gap          = 60 / metroBpm;
   const noteDuration = gap * 0.82;
-  const allNotes = [...scaleNotes, scaleNotes[0]]; // ascend + return to root one octave up
+  // Build ascending + descending sequence with octave tags
+  // Ascending: notes[0..n-1] octave 4, notes[n] octave 5 (high root)
+  // Descending: notes[n-1..0] octave 4, returning to root octave 4
+  const rootIdx = CHROMATIC.indexOf(scaleNotes[0]);
+  const allNotesWithOct = [];
+  scaleNotes.forEach((note, i) => {
+    const ni = CHROMATIC.indexOf(note);
+    const oct = ni < rootIdx ? 5 : 4;
+    allNotesWithOct.push({ note, oct });
+  });
+  // high root at top of ascent
+  allNotesWithOct.push({ note: scaleNotes[0], oct: 5 });
+  // descend: same notes reversed (skip the high root we just added, add low root at end)
+  for (let i = scaleNotes.length - 1; i >= 1; i--) {
+    const note = scaleNotes[i];
+    const ni = CHROMATIC.indexOf(note);
+    const oct = ni < rootIdx ? 5 : 4;
+    allNotesWithOct.push({ note, oct });
+  }
+  allNotesWithOct.push({ note: scaleNotes[0], oct: 4 });
+
   const now = ctx.currentTime + 0.05;
 
   // Pause standalone metronome while scale plays; restart after
@@ -1235,17 +2230,13 @@ function playScale(scaleNotes, btn, pianoEl) {
     osc.stop(startTime + duration + 0.15);
   }
 
-  const rootIdx = CHROMATIC.indexOf(scaleNotes[0]);
   const timeouts = [];
-  allNotes.forEach((note, i) => {
-    const noteIdx = CHROMATIC.indexOf(note);
-    const isLast  = i === allNotes.length - 1;
-    const isHigh  = isLast || noteIdx < rootIdx;
+  allNotesWithOct.forEach(({ note, oct }, i) => {
     let freq = NOTE_FREQ[note];
-    if (isHigh) freq *= 2;
+    if (oct === 5) freq *= 2;
     scheduleNote(freq, now + i * gap, noteDuration);
 
-    const mapKey = `${note}-${isHigh ? '5' : '4'}`;
+    const mapKey = `${note}-${oct}`;
 
     const t1 = setTimeout(() => {
       Object.values(keyMap).forEach(k => k.classList.remove('playing'));
@@ -1275,7 +2266,7 @@ function playScale(scaleNotes, btn, pianoEl) {
   };
 
   // Done
-  const totalMs = (now + allNotes.length * gap - ctx.currentTime) * 1000;
+  const totalMs = (now + allNotesWithOct.length * gap - ctx.currentTime) * 1000;
   const tDone = setTimeout(() => cleanup(true), totalMs);
   timeouts.push(tDone);
 
@@ -1334,6 +2325,124 @@ function playChord(rootSemitone, semitones, btn) {
     chordStop = null;
   };
   chordStop.btn = btn;
+}
+
+// Build a close-position voicing as absolute MIDI-style pitches (middle C = 48).
+// pcs: array of pitch classes (0-11). baseOct: starting octave (4 = middle).
+function buildCloseVoicing(pcs, baseOct) {
+  const unique = [...new Set(pcs)].sort((a, b) => a - b);
+  const result = [];
+  let prev = -1;
+  unique.forEach(pc => {
+    let abs = pc + baseOct * 12;
+    while (abs <= prev) abs += 12;
+    result.push(abs);
+    prev = abs;
+  });
+  return result;
+}
+
+// Voice lead from prevVoicing (absolute pitches) to nextPCs (pitch classes).
+// Each pitch class gets placed at the absolute pitch closest to the centroid.
+function voiceLead(prevVoicing, nextPCs) {
+  const centroid = prevVoicing.reduce((a, b) => a + b, 0) / prevVoicing.length;
+  const result = nextPCs.map(pc => {
+    let abs = pc % 12;
+    // Start from a low base and walk up to the candidate nearest centroid
+    abs += 12 * Math.round((centroid - abs) / 12);
+    // Fine-tune: step by semitone to the nearest option within ±6
+    if (abs < centroid - 6) abs += 12;
+    if (abs > centroid + 6) abs -= 12;
+    return abs;
+  });
+  result.sort((a, b) => a - b);
+  return result;
+}
+
+function playProgression(ri, chords, btn, pillEls, onStep) {
+  if (progStop) {
+    const wasSame = progStop.btn === btn;
+    progStop();
+    if (wasSame) return;
+  }
+
+  const ctx = getAudioCtx();
+  const chordDur = (60 / metroBpm) * 2; // 2 beats per chord
+  const strum    = 0.04;
+  const now      = ctx.currentTime + 0.05;
+
+  // Build voice-led voicings for every chord in the progression
+  const voicings = [];
+  chords.forEach((ch, i) => {
+    const chordRi = (ri + ch.semitone) % 12;
+    // Absolute pitch classes for this chord (shifted by root)
+    const pcs = ch.semitones.map(s => (chordRi + s) % 12);
+    if (i === 0) {
+      voicings.push(buildCloseVoicing(pcs, 4));
+    } else {
+      voicings.push(voiceLead(voicings[i - 1], pcs));
+    }
+  });
+
+  const masterGain = ctx.createGain();
+  masterGain.gain.setValueAtTime(1, now);
+  masterGain.connect(ctx.destination);
+
+  // C4 = MIDI 48; freq = 261.63 * 2^((abs-48)/12)
+  function scheduleVoicing(absPitches, startTime) {
+    absPitches.forEach((abs, i) => {
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(masterGain);
+      osc.type = 'triangle';
+      const freq = 261.63 * Math.pow(2, (abs - 48) / 12);
+      const t = startTime + i * strum;
+      osc.frequency.setValueAtTime(freq, t);
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.3,   t + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.1, t + 0.08);
+      gain.gain.setValueAtTime(0.1, t + chordDur - 0.06);
+      gain.gain.linearRampToValueAtTime(0.0001, t + chordDur + 0.08);
+      osc.start(t);
+      osc.stop(t + chordDur + 0.12);
+    });
+  }
+
+  voicings.forEach((absPitches, i) => {
+    scheduleVoicing(absPitches, now + i * chordDur);
+  });
+
+  const timeouts = [];
+
+  chords.forEach((_, i) => {
+    const t = setTimeout(() => {
+      pillEls.forEach(p => p.classList.remove('prog-pill-active'));
+      if (pillEls[i]) pillEls[i].classList.add('prog-pill-active');
+      btn.classList.add('playing');
+      btn.innerHTML = stopIcon() + ' Stop';
+      if (onStep) onStep(i, voicings[i]);
+    }, (now + i * chordDur - ctx.currentTime) * 1000);
+    timeouts.push(t);
+  });
+
+  const tDone = setTimeout(() => {
+    pillEls.forEach(p => p.classList.remove('prog-pill-active'));
+    btn.classList.remove('playing');
+    btn.innerHTML = playIcon() + ' Play';
+    progStop = null;
+  }, (now + chords.length * chordDur - ctx.currentTime) * 1000);
+  timeouts.push(tDone);
+
+  progStop = () => {
+    timeouts.forEach(clearTimeout);
+    masterGain.gain.setValueAtTime(0, ctx.currentTime);
+    pillEls.forEach(p => p.classList.remove('prog-pill-active'));
+    btn.classList.remove('playing');
+    btn.innerHTML = playIcon() + ' Play';
+    progStop = null;
+  };
+  progStop.btn = btn;
 }
 
 function playIcon() {
