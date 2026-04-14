@@ -504,6 +504,60 @@
     .sidebar-nav-btn svg { flex-shrink: 0; opacity: 0.75; }
     .sidebar-nav-btn.active svg { opacity: 1; }
 
+    /* Quiz styles */
+    .quiz-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      max-width: 600px;
+      margin-top: 1.5rem;
+    }
+    @media (max-width: 600px) {
+      .quiz-grid { grid-template-columns: 1fr; }
+    }
+    .quiz-option {
+      background: #111;
+      border: 1px solid #222;
+      color: #999;
+      padding: 1.2rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .quiz-option:hover {
+      background: #181818;
+      border-color: #333;
+      color: #fff;
+    }
+    .quiz-option.correct {
+      background: #142818;
+      border-color: #2e7d32;
+      color: #a5d6a7;
+    }
+    .quiz-option.incorrect {
+      background: #2d1414;
+      border-color: #c62828;
+      color: #ef9a9a;
+    }
+    .quiz-feedback {
+      margin-top: 1.5rem;
+      font-size: 1rem;
+      font-weight: 500;
+      min-height: 1.5rem;
+    }
+    .quiz-score-pill {
+      display: inline-block;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: #c8a96e;
+      margin-bottom: 1rem;
+    }
+
 
     /* ── Active chord pill during progression playback ── */
     .prog-pill-active {
@@ -1142,8 +1196,15 @@ const MODES = [
 
 let currentMode = MODES[0].modes[1]; // default: Dorian
 let currentRoot = 'C';
-let currentView = 'modes'; // 'modes' | 'chords'
+let currentView = 'modes'; // 'modes' | 'chords' | 'chordtypes' | 'scales' | 'quiz'
 let modesListOpen = true;
+
+// Quiz state
+let quizScore = 0;
+let quizTotal = 0;
+let currentQuizChord = null;
+let currentQuizOptions = [];
+let quizAnswered = false;
 
 const SCALES_DATA = [
   {
@@ -1588,6 +1649,9 @@ function chordIcon() {
 function modesIcon() {
   return `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><line x1="2" y1="4" x2="12" y2="4"/><line x1="2" y1="7" x2="10" y2="7"/><line x1="2" y1="10" x2="8" y2="10"/></svg>`;
 }
+function quizIcon() {
+  return `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M7 10h.01M7 7.5a2 2 0 1 0-1.41-3.41"/><circle cx="7" cy="7" r="6"/></svg>`;
+}
 
 function renderSidebar() {
   // Desktop sidebar
@@ -1674,9 +1738,21 @@ function renderSidebar() {
     renderSidebar();
   };
 
+  const quizNavBtn = document.createElement('button');
+  quizNavBtn.className = 'sidebar-nav-btn' + (currentView === 'quiz' ? ' active' : '');
+  quizNavBtn.innerHTML = quizIcon() + 'Quiz';
+  quizNavBtn.onclick = () => {
+    if (playbackStop) playbackStop();
+    currentView = 'quiz';
+    if (!currentQuizChord) generateQuizQuestion();
+    renderQuizView();
+    renderSidebar();
+  };
+
   nav.appendChild(cpBtn);
   nav.appendChild(chordsBtn);
   nav.appendChild(scalesNavBtn);
+  nav.appendChild(quizNavBtn);
   sidebar.appendChild(nav);
 
   // Mobile dropdown — rebuild options, keep selected in sync
@@ -2096,6 +2172,7 @@ document.getElementById('mobileModePick').addEventListener('change', e => {
   const mode = MODES[opt.dataset.groupIdx].modes[opt.dataset.modeIdx];
   if (playbackStop) playbackStop();
   currentMode = mode;
+  currentView = 'modes';
   renderMain();
   renderSidebar();
 });
@@ -2183,6 +2260,137 @@ function makeSection(titleText, open = true) {
   section.appendChild(titleBtn);
   section.appendChild(body);
   return { section, body };
+}
+
+function generateQuizQuestion() {
+  const allChords = [];
+  CHORD_TYPES.forEach(group => {
+    group.chords.forEach(ch => {
+      allChords.push({ ...ch, group: group.group });
+    });
+  });
+
+  // Pick a random chord as correct answer
+  const correct = allChords[Math.floor(Math.random() * allChords.length)];
+  currentQuizChord = correct;
+
+  // Pick 3 random incorrect answers
+  const others = allChords.filter(ch => ch.type !== correct.type);
+  const shuffledOthers = others.sort(() => 0.5 - Math.random());
+  const selectedOthers = shuffledOthers.slice(0, 3).map(ch => ch.type);
+
+  // Combine and shuffle options
+  const options = [correct.type, ...selectedOthers];
+  currentQuizOptions = options.sort(() => 0.5 - Math.random());
+  
+  quizAnswered = false;
+}
+
+function renderQuizView() {
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  const root = currentRoot;
+  const ri = CHROMATIC.indexOf(root);
+
+  const header = document.createElement('div');
+  header.className = 'mode-header';
+  header.innerHTML = `
+    <h2>Chord Ear Training</h2>
+    <div class="parent">Identify the chord type by ear. All chords are played in <strong>${root}</strong>.</div>
+  `;
+  main.appendChild(header);
+
+  const scorePill = document.createElement('div');
+  scorePill.className = 'quiz-score-pill';
+  scorePill.textContent = `Score: ${quizScore} / ${quizTotal}`;
+  main.appendChild(scorePill);
+
+  // Root selector for quiz
+  const rootWrap = document.createElement('div');
+  rootWrap.className = 'root-selector';
+  rootWrap.style.marginBottom = '2rem';
+  CHROMATIC.forEach(r => {
+    const btn = document.createElement('button');
+    btn.className = 'root-btn' + (r === root ? ' active' : '');
+    btn.textContent = r;
+    btn.onclick = () => {
+      currentRoot = r;
+      renderQuizView();
+      renderSidebar();
+    };
+    rootWrap.appendChild(btn);
+  });
+  main.appendChild(rootWrap);
+
+  const quizBlock = document.createElement('div');
+  quizBlock.className = 'cp-section';
+
+  const playRow = document.createElement('div');
+  playRow.style.cssText = 'display:flex;align-items:center;gap:1.5rem;margin-bottom:2rem;';
+  
+  const playBtn = document.createElement('button');
+  playBtn.className = 'play-btn';
+  playBtn.innerHTML = playIcon() + 'Play Mystery Chord';
+  playBtn.onclick = () => {
+    playChord(ri, currentQuizChord.semitones, playBtn);
+  };
+  playRow.appendChild(playBtn);
+  quizBlock.appendChild(playRow);
+
+  const optionsGrid = document.createElement('div');
+  optionsGrid.className = 'quiz-grid';
+
+  const feedbackArea = document.createElement('div');
+  feedbackArea.className = 'quiz-feedback';
+
+  currentQuizOptions.forEach(opt => {
+    const btn = document.createElement('div');
+    btn.className = 'quiz-option';
+    btn.textContent = opt;
+    
+    if (quizAnswered) {
+      if (opt === currentQuizChord.type) btn.classList.add('correct');
+      // else if (btn was clicked and incorrect...) — we need to track what was clicked
+    }
+
+    btn.onclick = () => {
+      if (quizAnswered) return;
+      quizAnswered = true;
+      quizTotal++;
+      
+      const isCorrect = (opt === currentQuizChord.type);
+      if (isCorrect) {
+        quizScore++;
+        btn.classList.add('correct');
+        feedbackArea.innerHTML = '<span style="color:#a5d6a7">Correct!</span>';
+      } else {
+        btn.classList.add('incorrect');
+        feedbackArea.innerHTML = `<span style="color:#ef9a9a">Incorrect. It was <b>${currentQuizChord.type}</b>.</span>`;
+        // Also highlight the correct one
+        optionsGrid.querySelectorAll('.quiz-option').forEach(b => {
+          if (b.textContent === currentQuizChord.type) b.classList.add('correct');
+        });
+      }
+
+      scorePill.textContent = `Score: ${quizScore} / ${quizTotal}`;
+
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'play-btn';
+      nextBtn.style.marginTop = '1.5rem';
+      nextBtn.innerHTML = 'Next Question →';
+      nextBtn.onclick = () => {
+        generateQuizQuestion();
+        renderQuizView();
+      };
+      feedbackArea.appendChild(document.createElement('br'));
+      feedbackArea.appendChild(nextBtn);
+    };
+    optionsGrid.appendChild(btn);
+  });
+
+  quizBlock.appendChild(optionsGrid);
+  quizBlock.appendChild(feedbackArea);
+  main.appendChild(quizBlock);
 }
 
 function renderMain() {
@@ -2419,6 +2627,7 @@ document.getElementById('rootSelect').addEventListener('change', e => {
   if (currentView === 'chords') renderChordProgressionView();
   else if (currentView === 'chordtypes') renderChordTypesView();
   else if (currentView === 'scales') renderScalesView();
+  else if (currentView === 'quiz') renderQuizView();
   else renderMain();
 });
 
@@ -2866,7 +3075,11 @@ metroCircleEl.addEventListener('pointerup', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 renderSidebar();
-renderMain();
+if (currentView === 'chords') renderChordProgressionView();
+else if (currentView === 'chordtypes') renderChordTypesView();
+else if (currentView === 'scales') renderScalesView();
+else if (currentView === 'quiz') renderQuizView();
+else renderMain();
 </script>
 </body>
 </html>
